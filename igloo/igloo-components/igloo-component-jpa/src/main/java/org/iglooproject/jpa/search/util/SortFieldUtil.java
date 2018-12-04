@@ -6,15 +6,14 @@ import javax.persistence.EntityManager;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.jpa.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.sort.SortAdditionalSortFieldContext;
-import org.hibernate.search.query.dsl.sort.SortContext;
-import org.hibernate.search.query.dsl.sort.SortFieldContext;
-import org.hibernate.search.query.dsl.sort.SortOrder;
-import org.hibernate.search.query.dsl.sort.SortTermination;
+import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
+import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SortOrderContext;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
+import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
+import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
 
 public final class SortFieldUtil {
 
@@ -24,11 +23,9 @@ public final class SortFieldUtil {
 		}
 		
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
-		QueryBuilder queryBuilder = fullTextEntityManager.getSearchFactory().buildQueryBuilder()
-				.forEntity(entityClass).get();
-		SortContext context = queryBuilder.sort();
-		SortAdditionalSortFieldContext fieldContext = null;
-		
+		FullTextSearchTarget<?> queryBuilder = fullTextEntityManager.search(entityClass);
+		SearchSortContainerContext context = queryBuilder.sort();
+
 		for (SortField sortField : sortFields) {
 			if (sortField == null) {
 				throw new IllegalStateException("SortField must not be null.");
@@ -36,54 +33,47 @@ public final class SortFieldUtil {
 			
 			switch (sortField.getType()) {
 			case SCORE:
-				fieldContext = fieldContext == null ? context.byScore() : fieldContext.andByScore();
+				ScoreSortContext score = context.byScore();
+				order(score, sortField);
 				break;
 			default:
-				fieldContext = fieldContext == null ? context.byField(sortField.getField()) : fieldContext.andByField(sortField.getField());
+				FieldSortContext fieldContext = context.byField(sortField.getField());
+				onMissingValue(fieldContext, sortField);
+				order(fieldContext, sortField);
 				break;
 			}
-			
-			fieldContext = onMissingValue(fieldContext, sortField);
-			fieldContext = order(fieldContext, sortField);
 		}
 		
 		return create(fieldContext);
 	}
 
-	private static SortAdditionalSortFieldContext onMissingValue(SortAdditionalSortFieldContext fieldContext, SortField sortField) {
-		if (!(fieldContext instanceof SortFieldContext)) {
-			return fieldContext;
+	private static void onMissingValue(FieldSortContext fieldContext, SortField sortField) {
+		if (!(fieldContext instanceof FieldSortContext)) {
+			return;
 		}
 		
-		if (sortField.missingValue == null) {
-			return fieldContext;
+		if (sortField.getMissingValue() == null) {
+			return;
 		}
-		
-		SortFieldContext sortFieldContext = (SortFieldContext) fieldContext;
 		
 		if (SortField.Type.STRING.equals(sortField.getType()) || SortField.Type.STRING_VAL.equals(sortField.getType())) {
-			if (SortField.STRING_FIRST.equals(sortField.missingValue)) {
-				sortFieldContext.onMissingValue().sortFirst();
-			} else if (SortField.STRING_LAST.equals(sortField.missingValue)) {
-				sortFieldContext.onMissingValue().sortLast();
+			if (SortField.STRING_FIRST.equals(sortField.getMissingValue())) {
+				fieldContext.onMissingValue().sortFirst();
+			} else if (SortField.STRING_LAST.equals(sortField.getMissingValue())) {
+				fieldContext.onMissingValue().sortLast();
 			}
 		} else {
-			sortFieldContext.onMissingValue().use(sortField.missingValue);
+			fieldContext.onMissingValue().use(sortField.getMissingValue());
 		}
 		
-		return fieldContext;
 	}
 
 	@SuppressWarnings("unchecked")
-	private static SortAdditionalSortFieldContext order(SortAdditionalSortFieldContext fieldContext, SortField sortField) {
-		if (!(fieldContext instanceof SortOrder)) {
-			throw new IllegalStateException("FieldContext must be a SortOrder.");
-		}
-		
-		return !sortField.getReverse() ? ((SortOrder<SortAdditionalSortFieldContext>) fieldContext).asc() : ((SortOrder<SortAdditionalSortFieldContext>) fieldContext).desc();
+	private static void order(SortOrderContext<?> fieldContext, SortField sortField) {
+		!sortField.getReverse() ? fieldContext.asc() : fieldContext.desc();
 	}
 
-	private static Sort create(SortAdditionalSortFieldContext fieldContext) {
+	private static Sort create(SearchSortContainerContext fieldContext) {
 		if (!(fieldContext instanceof SortTermination)) {
 			throw new IllegalStateException("FieldContext must be a SortTermination.");
 		}

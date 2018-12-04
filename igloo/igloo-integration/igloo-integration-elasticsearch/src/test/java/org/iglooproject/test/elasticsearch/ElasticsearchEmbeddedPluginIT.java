@@ -20,6 +20,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.StringEntity;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.iglooproject.lucene.analysis.french.CoreFrenchMinimalStemFilter;
@@ -99,7 +100,10 @@ public class ElasticsearchEmbeddedPluginIT {
 			content.put("filter", Collections.singletonList(CoreFrenchMinimalStemFilter.STEMMER_NAME));
 			content.put("text", "chapeaux");
 			HttpEntity entity = new StringEntity(OBJECT_MAPPER.writeValueAsString(content));
-			Response response = client.performRequest(GET_METHOD, "_analyze", params, entity);
+			Request request = new Request(GET_METHOD, "_analyze");
+			request.getParameters().putAll(params);
+			request.setEntity(entity);
+			Response response = client.performRequest(request);
 			try (InputStream is = response.getEntity().getContent()) {
 				JavaType type = OBJECT_MAPPER.getTypeFactory().constructMapLikeType(HashMap.class, String.class, Object.class);
 				Map<String, Object> value = OBJECT_MAPPER.readValue(is, type);

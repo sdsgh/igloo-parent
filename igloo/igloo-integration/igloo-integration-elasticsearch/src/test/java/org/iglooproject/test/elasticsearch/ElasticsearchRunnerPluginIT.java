@@ -15,6 +15,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.StringEntity;
 import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.settings.Settings;
@@ -52,7 +53,7 @@ public class ElasticsearchRunnerPluginIT {
 			public void build(final int number, final Settings.Builder settingsBuilder) {
 				settingsBuilder.put("http.cors.enabled", true);
 				settingsBuilder.put("http.cors.allow-origin", "*");
-				settingsBuilder.putArray("discovery.zen.ping.unicast.hosts", String.format("localhost:%d", tcpPort));
+				settingsBuilder.putList("discovery.zen.ping.unicast.hosts", String.format("localhost:%d", tcpPort));
 			}
 		}).build(ElasticsearchClusterRunner.newConfigs()
 				.baseHttpPort(httpPort - 1)
@@ -82,7 +83,10 @@ public class ElasticsearchRunnerPluginIT {
 			content.put("filter", Collections.singletonList(CoreFrenchMinimalStemFilter.STEMMER_NAME));
 			content.put("text", "chapeaux");
 			HttpEntity entity = new StringEntity(OBJECT_MAPPER.writeValueAsString(content));
-			Response response = client.performRequest(GET_METHOD, "_analyze", params, entity);
+			Request request = new Request(GET_METHOD, "_analyze");
+			request.getParameters().putAll(params);
+			request.setEntity(entity);
+			Response response = client.performRequest(request);
 			try (InputStream is = response.getEntity().getContent()) {
 				JavaType type = OBJECT_MAPPER.getTypeFactory().constructMapLikeType(HashMap.class, String.class,
 						Object.class);

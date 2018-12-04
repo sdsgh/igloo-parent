@@ -1,7 +1,5 @@
 package org.iglooproject.jpa.search.util;
 
-import org.hibernate.search.annotations.Normalizer;
-
 public final class HibernateSearchAnalyzer {
 	
 	public static final String TEXT = "text";
@@ -9,6 +7,7 @@ public final class HibernateSearchAnalyzer {
 	public static final String TEXT_STEMMING = "textStemming";
 	
 	/**
+	 * // TODO: hibernate-search - trouver la nouvelle façon de procéder
 	 * @deprecated Use {@link Normalizer} instead.
 	 */
 	@Deprecated

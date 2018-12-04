@@ -17,32 +17,15 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.hibernate.CacheMode;
-import org.hibernate.search.MassIndexer;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
-import org.hibernate.search.analyzer.impl.ScopedLuceneAnalyzerReference;
-import org.hibernate.search.analyzer.impl.SimpleLuceneAnalyzerReference;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
-import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
-import org.hibernate.search.elasticsearch.analyzer.impl.ScopedElasticsearchAnalyzerReference;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.integration.impl.SearchIntegration;
-import org.hibernate.search.hcore.util.impl.HibernateHelper;
-import org.hibernate.search.indexes.spi.LuceneEmbeddedIndexManagerType;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.impl.IndexedTypeSets;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
-import org.hibernate.search.util.impl.PassThroughAnalyzer;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
 import org.iglooproject.jpa.exception.ServiceException;
 import org.iglooproject.jpa.hibernate.analyzers.LuceneEmbeddedAnalyzerRegistry;
+import org.iglooproject.jpa.util.HibernateUtils;
 import org.iglooproject.spring.property.service.IPropertyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.google.common.collect.Maps;
+import com.querydsl.jpa.hibernate.HibernateUtil;
 
 @Repository("hibernateSearchDao")
 public class HibernateSearchDaoImpl implements IHibernateSearchDao {
@@ -78,7 +62,7 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	public Analyzer getAnalyzer(String analyzerName) {
 		if (jpaPropertiesProvider.isHibernateSearchElasticSearchEnabled()) {
 			if ("default".equals(analyzerName)) {
-				return PassThroughAnalyzer.INSTANCE;
+				return KeywordAnalyzer.INSTANCE;
 			} else {
 				checkClientSideAnalyzers(true);
 				return luceneEmbeddedAnalyzerRegistry.getAnalyzer(analyzerName);
@@ -89,7 +73,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 			return integration.getAnalyzerRegistry().getAnalyzerReference(analyzerName).unwrap(LuceneAnalyzerReference.class).getAnalyzer();
 		}
 	}
-	
+
+	// TODO hibernate 6 - find scoped analyzer for an entity type. Used to perform client-side analysis when needed
 	@Override
 	public Analyzer getAnalyzer(Class<?> entityType) {
 		SearchFactory searchFactory = Search.getFullTextEntityManager(getEntityManager()).getSearchFactory();
@@ -118,6 +103,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 		}
 	}
 
+	// TODO hibernate 6.0 : used to retrieve analyzer information on a given entity type. Here we find type
+	// related information from an entity type. Type inheritance is computed.
 	/**
 	 * Extracted from ConnectedQueryContextBuilder
 	 */
@@ -140,7 +127,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	public void reindexAll() throws ServiceException {
 		reindexClasses(Object.class);
 	}
-	
+
+	// TODO hibernate 6.0 : no search factory -> find a way to list indexed types
 	@Override
 	public void reindexClasses(Class<?>... classes) throws ServiceException {
 		try {
@@ -155,7 +143,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 			throw new ServiceException(e);
 		}
 	}
-	
+
+	// TODO hibernate 6.0 : no support for mass reindexation ?
 	protected void reindexClasses(FullTextEntityManager fullTextEntityManager, Set<Class<?>> entityClasses)
 			throws InterruptedException {
 		int batchSize = propertyService.get(HIBERNATE_SEARCH_REINDEX_BATCH_SIZE);
@@ -182,6 +171,7 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 		}
 	}
 
+	// TODO hibernate 6.0 : no search factory -> find a way to list indexed types
 	@Override
 	public Set<Class<?>> getIndexedRootEntities(Class<?>... selection) {
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
@@ -197,15 +187,20 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 		
 		return indexedEntityClasses;
 	}
-	
+
+	// TODO hibernate 6.0 : no support for reindex; is HibernateUtils.unwrap(...)
+	// different from HibernateHelper.unproxy(...)
 	@Override
 	public <K extends Serializable & Comparable<K>, E extends GenericEntity<K, ?>> void reindexEntity(E entity) {
 		if (entity != null) {
 			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
-			fullTextEntityManager.index(HibernateHelper.unproxy(entity));
+			fullTextEntityManager.index(HibernateUtils.unwrap(entity));
 		}
 	}
 	
+	// TODO hibernate 6.0 : no support for mass reindexation ?
+	// TODO hibernate 6.0 : no search factory
+	// purpose of SearchFactory was to enumerate all indexed types
 	/**
 	 * @see MassIndexerImpl#toRootEntities
 	 */
@@ -251,7 +246,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	protected EntityManager getEntityManager() {
 		return entityManager;
 	}
-	
+
+	// TODO hibernate 6.0 : no reindex, no way to follow reindex progress
 	private static final class ProgressMonitor implements MassIndexerProgressMonitor, Runnable {
 		
 		private static final Logger LOGGER = LoggerFactory.getLogger(ProgressMonitor.class);
@@ -323,6 +319,7 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 		}
 	}
 	
+	// TODO: hibernate 6.0 - no way to force flush to indexes ?
 	@Override
 	public void flushToIndexes() {
 		Search.getFullTextEntityManager(entityManager).flushToIndexes();

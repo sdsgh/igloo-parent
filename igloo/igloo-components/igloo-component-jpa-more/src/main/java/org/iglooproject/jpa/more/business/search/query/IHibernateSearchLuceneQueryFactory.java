@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.QueryBuilder;
 import org.bindgen.BindingRoot;
-import org.hibernate.search.query.dsl.QueryBuilder;
 
 public interface IHibernateSearchLuceneQueryFactory {
 

@@ -14,7 +14,6 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -237,7 +236,10 @@ public final class LuceneUtils {
 		return new RawLuceneQuery(sb.toString());
 	}
 	
-	@SuppressWarnings("unchecked")
+	/**
+	 * From Lucene 5.10.0 -> 6.5.0 migration: NumericRangeQuery no longer supported. Use {@link RawLuceneQuery} to
+	 * rewrite your query.
+	 */
 	public static String queryToString(Query luceneQuery) {
 		StringBuilder sb = new StringBuilder();
 		if (luceneQuery instanceof BooleanQuery) {
@@ -252,8 +254,6 @@ public final class LuceneUtils {
 			sb.append(formatPrefixQuery((PrefixQuery) luceneQuery));
 		} else if (luceneQuery instanceof WildcardQuery) {
 			sb.append(formatWildcardQuery((WildcardQuery) luceneQuery));
-		} else if (luceneQuery instanceof NumericRangeQuery) {
-			sb.append(formatNumericRangeQuery((NumericRangeQuery<? extends Number>) luceneQuery));
 		} else if (luceneQuery instanceof IToQueryStringAwareLuceneQuery) {
 			sb.append(((IToQueryStringAwareLuceneQuery) luceneQuery).toQueryString());
 		} else if (luceneQuery instanceof BoostQuery) {
@@ -362,11 +362,6 @@ public final class LuceneUtils {
 		}
 		sb.append(term.text());
 		return sb.toString();
-	}
-	
-	private static String formatNumericRangeQuery(NumericRangeQuery<? extends Number> numericRangeQuery) {
-		return toFilterRangeQuery(numericRangeQuery.getField(), numericRangeQuery.getMin(), numericRangeQuery.getMax(),
-				numericRangeQuery.includesMin(), numericRangeQuery.includesMax()).getQuery();
 	}
 	
 	private LuceneUtils() {

@@ -16,9 +16,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 import org.springframework.util.Assert;
 
 @Embeddable
@@ -36,7 +33,6 @@ public class GenericEntityReference<K extends Comparable<K> & Serializable, E ex
 	private /* final */ Class<? extends E> type;
 	
 	@Column(nullable = true)
-	@Field(analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
 	private /* final */ K id;
 
 	public static <K extends Comparable<K> & Serializable, E extends GenericEntity<K, ?>>

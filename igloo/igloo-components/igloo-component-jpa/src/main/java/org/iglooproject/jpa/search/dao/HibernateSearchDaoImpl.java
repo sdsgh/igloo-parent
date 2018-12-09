@@ -19,7 +19,10 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.hibernate.CacheMode;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.backend.lucene.impl.LuceneBackendImpl;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
@@ -54,6 +57,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	private Analyzer KEYWORD_ANALYZER = new KeywordAnalyzer();
 	
 	public HibernateSearchDaoImpl() {
 	}
@@ -62,12 +67,13 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	public Analyzer getAnalyzer(String analyzerName) {
 		if (jpaPropertiesProvider.isHibernateSearchElasticSearchEnabled()) {
 			if ("default".equals(analyzerName)) {
-				return KeywordAnalyzer.INSTANCE;
+				return KEYWORD_ANALYZER;
 			} else {
 				checkClientSideAnalyzers(true);
 				return luceneEmbeddedAnalyzerRegistry.getAnalyzer(analyzerName);
 			}
 		} else {
+			entityManager.getEntityManagerFactory().unwrap(SessionFactoryImplementor.class).getServiceRegistry().getService(HibernateSearchContextService.class).getMapping().createSearchManager(entityManager).search(targetedType)
 			ExtendedSearchIntegrator searchIntegrator = Search.getFullTextEntityManager(getEntityManager()).getSearchFactory().unwrap(ExtendedSearchIntegrator.class);
 			SearchIntegration integration = searchIntegrator.getIntegration(LuceneEmbeddedIndexManagerType.INSTANCE);
 			return integration.getAnalyzerRegistry().getAnalyzerReference(analyzerName).unwrap(LuceneAnalyzerReference.class).getAnalyzer();
@@ -77,6 +83,9 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	// TODO hibernate 6 - find scoped analyzer for an entity type. Used to perform client-side analysis when needed
 	@Override
 	public Analyzer getAnalyzer(Class<?> entityType) {
+		entityManager.getEntityManagerFactory().unwrap(SessionFactoryImplementor.class).getServiceRegistry()
+			.getService(HibernateSearchContextService.class).getMapping().createSearchManager(entityManager)
+			.search(entityType).predicate().match().onField("field").matching("value").toPredicate();
 		SearchFactory searchFactory = Search.getFullTextEntityManager(getEntityManager()).getSearchFactory();
 		ExtendedSearchIntegrator searchIntegrator = searchFactory.unwrap(ExtendedSearchIntegrator.class);
 		IndexedTypeIdentifier indexedType = getIndexBoundType(entityType, searchIntegrator);

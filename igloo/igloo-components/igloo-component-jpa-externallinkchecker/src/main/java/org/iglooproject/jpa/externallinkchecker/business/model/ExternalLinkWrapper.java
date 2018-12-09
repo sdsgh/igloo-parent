@@ -14,14 +14,13 @@ import javax.persistence.Transient;
 
 import org.bindgen.Bindable;
 import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.DocumentId;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
-
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.externallinkchecker.util.binding.CoreJpaExternalLinkCheckerBindings;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Maps;
 
 @Bindable
 @Cacheable

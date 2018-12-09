@@ -26,9 +26,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 import org.hibernate.Hibernate;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.iglooproject.commons.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +52,6 @@ public abstract class GenericEntity<K extends Comparable<K> & Serializable, E ex
 	private static final long serialVersionUID = -3988499137919577054L;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(GenericEntity.class);
-
-	public static final String ID_SORT = "idSort";
 
 	@SuppressWarnings("rawtypes")
 	private static final Ordering<Comparable> DEFAULT_KEY_ORDERING = Ordering.natural().nullsLast();
@@ -79,8 +77,8 @@ public abstract class GenericEntity<K extends Comparable<K> & Serializable, E ex
 	 */
 	@Override
 	@QueryType(PropertyType.COMPARABLE)
-	@Field(name = ID_SORT, analyze = Analyze.NO)
-	@SortableField(forField = ID_SORT)
+	@DocumentId
+	@GenericField(sortable = Sortable.YES)
 	public abstract K getId();
 
 	/**

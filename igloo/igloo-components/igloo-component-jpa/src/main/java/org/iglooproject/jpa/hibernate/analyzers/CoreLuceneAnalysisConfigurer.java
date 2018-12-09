@@ -5,31 +5,31 @@ import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.TrimFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory;
+import org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceFilterFactory;
-import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
-import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
-import org.iglooproject.lucene.analysis.french.CoreFrenchMinimalStemFilterFactory;
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 import org.iglooproject.jpa.search.util.HibernateSearchNormalizer;
+import org.iglooproject.lucene.analysis.french.CoreFrenchMinimalStemFilterFactory;
 
-public class CoreLuceneAnalyzersDefinitionProvider implements LuceneAnalysisDefinitionProvider {
+public class CoreLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
 
 	@Override
-	public void register(LuceneAnalysisDefinitionRegistryBuilder builder) {
-		registerWithPrefix("", builder);
+	public void configure(LuceneAnalysisDefinitionContainerContext context) {
+		configureWithPrefix("", context);
 	}
 
-	protected void registerWithPrefix(String prefix, LuceneAnalysisDefinitionRegistryBuilder builder) {
-		builder.analyzer(prefix + HibernateSearchAnalyzer.KEYWORD).tokenizer(KeywordTokenizerFactory.class);
+	protected void configureWithPrefix(String prefix, LuceneAnalysisDefinitionContainerContext context) {
+		context.analyzer(prefix + HibernateSearchAnalyzer.KEYWORD).custom().tokenizer(KeywordTokenizerFactory.class);
 		
-		builder.analyzer(prefix + HibernateSearchAnalyzer.KEYWORD_CLEAN).tokenizer(KeywordTokenizerFactory.class)
+		context.analyzer(prefix + HibernateSearchAnalyzer.KEYWORD_CLEAN).custom().tokenizer(KeywordTokenizerFactory.class)
 			.tokenFilter(ASCIIFoldingFilterFactory.class)
 			.tokenFilter(LowerCaseFilterFactory.class);
 		
-		builder.analyzer(prefix + HibernateSearchAnalyzer.TEXT).tokenizer(WhitespaceTokenizerFactory.class)
+		context.analyzer(prefix + HibernateSearchAnalyzer.TEXT).custom().tokenizer(WhitespaceTokenizerFactory.class)
 				.tokenFilter(ASCIIFoldingFilterFactory.class)
-				.tokenFilter(WordDelimiterFilterFactory.class)
+				.tokenFilter(WordDelimiterGraphFilterFactory.class)
 						.param("generateWordParts", "1")
 						.param("generateNumberParts", "1")
 						.param("catenateWords", "0")
@@ -40,9 +40,9 @@ public class CoreLuceneAnalyzersDefinitionProvider implements LuceneAnalysisDefi
 						.param("preserveOriginal", "1")
 				.tokenFilter(LowerCaseFilterFactory.class);
 		
-		builder.analyzer(prefix + HibernateSearchAnalyzer.TEXT_STEMMING).tokenizer(WhitespaceTokenizerFactory.class)
+		context.analyzer(prefix + HibernateSearchAnalyzer.TEXT_STEMMING).custom().tokenizer(WhitespaceTokenizerFactory.class)
 				.tokenFilter(ASCIIFoldingFilterFactory.class)
-				.tokenFilter(WordDelimiterFilterFactory.class)
+				.tokenFilter(WordDelimiterGraphFilterFactory.class)
 						.param("generateWordParts", "1")
 						.param("generateNumberParts", "1")
 						.param("catenateWords", "0")
@@ -54,7 +54,7 @@ public class CoreLuceneAnalyzersDefinitionProvider implements LuceneAnalysisDefi
 				.tokenFilter(LowerCaseFilterFactory.class)
 				.tokenFilter(CoreFrenchMinimalStemFilterFactory.class);
 		
-		builder.analyzer(prefix + HibernateSearchAnalyzer.TEXT_SORT).tokenizer(KeywordTokenizerFactory.class)
+		context.analyzer(prefix + HibernateSearchAnalyzer.TEXT_SORT).custom().tokenizer(KeywordTokenizerFactory.class)
 				.tokenFilter(ASCIIFoldingFilterFactory.class)
 				.tokenFilter(LowerCaseFilterFactory.class)
 				.tokenFilter(PatternReplaceFilterFactory.class)
@@ -67,13 +67,13 @@ public class CoreLuceneAnalyzersDefinitionProvider implements LuceneAnalysisDefi
 						.param("replace", "all")
 				.tokenFilter(TrimFilterFactory.class);
 		
-		builder.normalizer(prefix + HibernateSearchNormalizer.KEYWORD);
+		context.normalizer(prefix + HibernateSearchNormalizer.KEYWORD);
 		
-		builder.normalizer(prefix + HibernateSearchNormalizer.KEYWORD_CLEAN)
+		context.normalizer(prefix + HibernateSearchNormalizer.KEYWORD_CLEAN).custom()
 				.tokenFilter(ASCIIFoldingFilterFactory.class)
 				.tokenFilter(LowerCaseFilterFactory.class);
 		
-		builder.normalizer(HibernateSearchNormalizer.TEXT)
+		context.normalizer(HibernateSearchNormalizer.TEXT).custom()
 				.tokenFilter(ASCIIFoldingFilterFactory.class)
 				.tokenFilter(LowerCaseFilterFactory.class)
 				.tokenFilter(PatternReplaceFilterFactory.class)

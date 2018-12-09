@@ -12,14 +12,11 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 
 public class GenericEntityCollectionReference<K extends Comparable<K> & Serializable, E extends GenericEntity<K, ?>>
 		implements Serializable {
@@ -30,7 +27,7 @@ public class GenericEntityCollectionReference<K extends Comparable<K> & Serializ
 	private final Class<? extends E> entityClass;
 	
 	@Column(nullable = true)
-	@Field(analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
+	@GenericField
 	private final List<K> entityIdList;
 	
 	public static <K extends Comparable<K> & Serializable, E extends GenericEntity<K, ?>>

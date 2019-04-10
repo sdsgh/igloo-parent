@@ -3,6 +3,7 @@ package test.specific;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.igloo.spring.autoconfigure.EnableIglooAutoConfiguration;
+import org.igloo.spring.autoconfigure.applicationconfig.IglooApplicationConfigAutoConfiguration;
 import org.igloo.spring.autoconfigure.bootstrap.IglooBootstrap3AutoConfiguration;
 import org.igloo.spring.autoconfigure.security.IglooJpaSecurityAutoConfiguration;
 import org.iglooproject.infinispan.service.IInfinispanClusterService;
@@ -34,7 +35,8 @@ public class InfinispanAutoConfigurationTestCase {
 	}
 	
 	@Configuration
-	@EnableIglooAutoConfiguration(exclude = {IglooBootstrap3AutoConfiguration.class, IglooJpaSecurityAutoConfiguration.class})
+	@EnableIglooAutoConfiguration(exclude = {IglooBootstrap3AutoConfiguration.class, IglooJpaSecurityAutoConfiguration.class,
+			IglooApplicationConfigAutoConfiguration.class})
 	public static class TestConfig {}
 
 }

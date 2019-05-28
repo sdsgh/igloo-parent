@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.igloo.spring.autoconfigure.property.IglooPropertyAutoConfiguration;
+import org.iglooproject.config.bootstrap.spring.annotations.IglooPropertySourcePriority;
 import org.iglooproject.jpa.config.spring.FlywayPropertyRegistryConfig;
 import org.iglooproject.jpa.more.config.util.FlywayConfiguration;
 import org.iglooproject.jpa.more.config.util.FlywaySpring;
@@ -28,7 +29,10 @@ import com.google.common.collect.Maps;
 @ConditionalOnClass(Flyway.class)
 @Import({ FlywayPropertyRegistryConfig.class })
 @AutoConfigureAfter(IglooPropertyAutoConfiguration.class)
-@PropertySource(ConfigurationPropertiesUrlConstants.FLYWAY_COMMON)
+@PropertySource(
+	name = IglooPropertySourcePriority.COMPONENT,
+	value = ConfigurationPropertiesUrlConstants.FLYWAY_COMMON
+)
 public class IglooFlywayAutoConfiguration {
 
 	@Bean(initMethod = "migrate", value = { "flyway", "databaseInitialization" })

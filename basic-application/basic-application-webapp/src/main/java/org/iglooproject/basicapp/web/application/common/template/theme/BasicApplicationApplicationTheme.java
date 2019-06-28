@@ -83,7 +83,7 @@ public enum BasicApplicationApplicationTheme {
 				),
 				
 				new org.iglooproject.basicapp.web.application.common.template.theme.advanced.SidebarPanel(
-					"sidenav",
+					"sidebar",
 					mainNavSupplier,
 					firstMenuPageSupplier,
 					secondMenuPageSupplier
@@ -115,6 +115,14 @@ public enum BasicApplicationApplicationTheme {
 			return Condition.alwaysFalse();
 		}
 		return Condition.isEqual(Model.of(this), Model.of(applicationTheme));
+	}
+
+	public Condition isBasic() {
+		return isEqual(BasicApplicationApplicationTheme.BASIC);
+	}
+
+	public Condition isAdvanced() {
+		return isEqual(BasicApplicationApplicationTheme.ADVANCED);
 	}
 
 }

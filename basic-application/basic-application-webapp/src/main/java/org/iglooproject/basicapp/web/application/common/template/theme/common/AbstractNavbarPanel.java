@@ -39,38 +39,40 @@ public abstract class AbstractNavbarPanel extends Panel {
 		);
 	}
 
-	protected void addActiveClass(
+	protected boolean addActiveClass(
 		ListItem<NavigationMenuItem> item,
 		Class<? extends Page> clazz,
 		Component component
 	) {
-		addActiveClass(
+		return addActiveClass(
 			item.getModelObject()::isActive,
 			clazz,
 			component
 		);
 	}
 
-	protected void addActiveClass(
+	protected boolean addActiveClass(
 		IPageLinkGenerator pageLinkGenerator,
 		Class<? extends Page> clazz,
 		Component component
 	) {
-		addActiveClass(
+		return addActiveClass(
 			pageLinkGenerator::isActive,
 			clazz,
 			component
 		);
 	}
 
-	private void addActiveClass(
+	private boolean addActiveClass(
 		Predicate<Class<? extends Page>> predicate,
 		Class<? extends Page> clazz,
 		Component component
 	) {
 		if (predicate.test(clazz)) {
 			component.add(new ClassAttributeAppender("active"));
+			return true;
 		}
+		return false;
 	}
 
 }

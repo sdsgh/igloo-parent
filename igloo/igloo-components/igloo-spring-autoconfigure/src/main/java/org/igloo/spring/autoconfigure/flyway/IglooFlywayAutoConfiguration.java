@@ -14,7 +14,6 @@ import org.iglooproject.jpa.more.config.util.FlywayConfiguration;
 import org.iglooproject.jpa.more.config.util.FlywaySpring;
 import org.iglooproject.jpa.property.FlywayPropertyIds;
 import org.iglooproject.spring.property.service.IPropertyService;
-import org.iglooproject.test.config.spring.ConfigurationPropertiesUrlConstants;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -31,7 +30,7 @@ import com.google.common.collect.Maps;
 @AutoConfigureAfter(IglooPropertyAutoConfiguration.class)
 @PropertySource(
 	name = IglooPropertySourcePriority.COMPONENT,
-	value = ConfigurationPropertiesUrlConstants.FLYWAY_COMMON
+	value = "classpath:/configuration/flyway-common.properties"
 )
 public class IglooFlywayAutoConfiguration {
 

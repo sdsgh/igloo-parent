@@ -43,6 +43,7 @@
 		<!-- https://hibernate.atlassian.net/browse/HHH-12932?jql=project%20%3D%20HHH%20AND%20fixVersion%20in%20(5.3.6)%20ORDER%20BY%20updated -->
 		<!-- https://hibernate.atlassian.net/browse/HHH-12784?jql=project%20%3D%20HHH%20AND%20fixVersion%20%3D%205.3.7%20ORDER%20BY%20updated -->
 		<!-- http://hibernate.org/orm/releases/5.4/ -->
+		<igloo.hibernate6.version>6.0.0.Alpha3</igloo.hibernate6.version>
 		<igloo.hibernate.version>5.4.10.Final</igloo.hibernate.version>
 		<igloo.hibernate-validator.version>5.4.3.Final</igloo.hibernate-validator.version>
 		<igloo.javax-persistence-api.version>2.2</igloo.javax-persistence-api.version> <!-- keep synchronized with hibernate -->
@@ -105,6 +106,7 @@
 		<!-- https://in.relation.to/2019/09/19/hibernate-search-5-11-3-Final/ -->
 		<!-- https://in.relation.to/2019/11/22/hibernate-search-5-11-4-Final-and-5-10-8-Final/ -->
 		<igloo.hibernate-search.version>5.11.4.Final</igloo.hibernate-search.version>
+		<igloo.hibernate6-search.version>6.0.0.Beta2</igloo.hibernate6-search.version>
 		<!-- both needed by less4j and hibernate-search ; we keep hibernate-search version -->
 		<igloo.gson.version>2.8.6</igloo.gson.version>
 		<!-- overriden in some modules, when we are in a elasticsearch context -->
@@ -684,6 +686,18 @@
 						<groupId>org.hibernate</groupId>
 						<artifactId>hibernate-core</artifactId>
 						<version>${igloo.hibernate.version}</version>
+					</dependency>
+
+					<dependency>
+						<groupId>org.hibernate</groupId>
+						<artifactId>hibernate-core</artifactId>
+						<version>${igloo.hibernate6.version}</version>
+						<exclusions>
+							<exclusion>
+								<artifactId>xml-apis</artifactId>
+								<groupId>xml-apis</groupId>
+							</exclusion>
+						</exclusions>
 					</dependency>
 
 					<dependency>
@@ -1274,6 +1288,13 @@
 							<artifactId>commons-logging</artifactId>
 						</exclusion>
 					</exclusions>
+				</dependency>
+
+				<!-- Hibernate-search -->
+				<dependency>
+					<groupId>org.iglooproject.dependencies</groupId>
+					<artifactId>igloo-dependency-hibernate6-search</artifactId>
+					<version>1.5-SNAPSHOT</version>
 				</dependency>
 
 				<!-- Hibernate-search -->

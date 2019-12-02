@@ -18,15 +18,8 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SortComparator;
 import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Normalizer;
-import org.hibernate.search.annotations.SortableField;
 import org.iglooproject.commons.util.collections.CollectionUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
-import org.iglooproject.jpa.search.util.HibernateSearchNormalizer;
 import org.iglooproject.jpa.security.business.authority.model.Authority;
 import org.iglooproject.jpa.security.business.person.util.AbstractUserComparator;
 import org.springframework.security.acls.model.Permission;
@@ -48,13 +41,9 @@ public abstract class GenericUserGroup<G extends GenericUserGroup<G, PERSON>, PE
 	public static final String NAME_SORT = "nameSort";
 	
 	@Id
-	@DocumentId
 	@GeneratedValue
 	private Long id;
 
-	@Field(name = NAME, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.TEXT))
-	@Field(name = NAME_SORT, normalizer = @Normalizer(definition = HibernateSearchNormalizer.TEXT))
-	@SortableField(forField = NAME_SORT)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private String name;
 

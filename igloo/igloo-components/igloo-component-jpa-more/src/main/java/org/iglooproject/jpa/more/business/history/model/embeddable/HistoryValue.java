@@ -11,12 +11,7 @@ import javax.persistence.Embedded;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-
 import org.iglooproject.jpa.business.generic.model.GenericEntityReference;
-import org.iglooproject.jpa.search.bridge.NullEncodingGenericEntityReferenceFieldBridge;
 
 @Embeddable
 @Bindable
@@ -40,7 +35,6 @@ public class HistoryValue implements Serializable {
 	private String serialized;
 	
 	@Embedded
-	@Field(name = REFERENCE, bridge = @FieldBridge(impl = NullEncodingGenericEntityReferenceFieldBridge.class), analyze = Analyze.NO)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private HistoryEntityReference reference;
 

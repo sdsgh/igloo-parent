@@ -8,8 +8,6 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,21 +19,16 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.iglooproject.commons.util.CloneUtils;
+import org.iglooproject.commons.util.collections.CollectionUtils;
+import org.iglooproject.commons.util.fieldpath.FieldPath;
+import org.iglooproject.jpa.more.business.history.model.embeddable.HistoryValue;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.iglooproject.commons.util.CloneUtils;
-import org.iglooproject.commons.util.collections.CollectionUtils;
-import org.iglooproject.commons.util.fieldpath.FieldPath;
-import org.iglooproject.jpa.more.business.history.model.embeddable.HistoryValue;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 
 @Bindable
 @SuppressFBWarnings("squid:S00107")
@@ -82,14 +75,10 @@ public abstract class AbstractHistoryLog<
 	
 	@Basic(optional = false)
 	@Temporal(TemporalType.TIMESTAMP)
-	@Field(name = DATE)
-	@SortableField(forField = DATE)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private Date date;
 
 	@Basic(optional = false)
-	@Enumerated(EnumType.STRING)
-	@Field(analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
 	private HET eventType;
 	
 	@Embedded
@@ -269,7 +258,6 @@ public abstract class AbstractHistoryLog<
 	}
 	
 	@Transient
-	@Field(name = HAS_DIFFERENCES, analyze = Analyze.NO)
 	public boolean isDifferencesNonEmpty() {
 		return !differences.isEmpty();
 	}

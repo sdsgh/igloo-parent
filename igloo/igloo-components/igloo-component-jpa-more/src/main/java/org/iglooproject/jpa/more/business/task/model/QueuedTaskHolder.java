@@ -33,7 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Entity
 @Bindable
-@Indexed
 public class QueuedTaskHolder extends GenericEntity<Long, QueuedTaskHolder> {
 
 	private static final long serialVersionUID = 3926959721176678607L;
@@ -56,40 +55,26 @@ public class QueuedTaskHolder extends GenericEntity<Long, QueuedTaskHolder> {
 
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Long id;
 
 	@Column(nullable = false)
-	@Field(name = NAME, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.TEXT))
-	@Field(name = NAME_SORT, normalizer = @Normalizer(definition = HibernateSearchNormalizer.TEXT))
-	@SortableField(forField = NAME_SORT)
 	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private String name;
 
 	@Column(nullable = true)
-	@Field(name = QUEUE_ID, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD), indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private String queueId;
 
 	@Column(nullable = false)
-	@Field(name = TASK_TYPE, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
 	private String taskType;
 
 	@Column(nullable = false)
-	@Field(name = CREATION_DATE)
-	@SortableField(forField = CREATION_DATE)
 	private Date creationDate;
 
-	@Field(name = TRIGGERING_DATE)
-	@SortableField(forField = TRIGGERING_DATE)
 	private Date triggeringDate = null;
 
-	@Field(name = START_DATE)
-	@SortableField(forField = START_DATE)
 	private Date startDate = null;
 
-	@Field(name = END_DATE)
-	@SortableField(forField = END_DATE)
 	private Date endDate = null;
 
 	@Version
@@ -102,13 +87,11 @@ public class QueuedTaskHolder extends GenericEntity<Long, QueuedTaskHolder> {
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	@Field(name = STATUS, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private TaskStatus status;
 	
 	@Column
 	@Enumerated(EnumType.STRING)
-	@Field(name = RESULT, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private TaskResult result;
 

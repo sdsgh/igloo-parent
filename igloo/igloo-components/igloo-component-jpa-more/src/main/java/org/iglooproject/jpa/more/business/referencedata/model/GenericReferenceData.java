@@ -6,12 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
@@ -38,12 +34,9 @@ public abstract class GenericReferenceData<E extends GenericReferenceData<?, ?>,
 	public abstract T getLabel();
 	
 	@Basic(optional = false)
-	@Field(name = POSITION, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
-	@SortableField(forField = POSITION)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private Integer position = 0;
 
-	@Field(name = ENABLED)
 	@Basic(optional = false)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private boolean enabled = true;

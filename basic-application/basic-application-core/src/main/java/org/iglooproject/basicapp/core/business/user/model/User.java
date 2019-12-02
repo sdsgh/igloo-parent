@@ -8,14 +8,12 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
 
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Indexed;
 import org.iglooproject.basicapp.core.business.user.model.embeddable.UserAnnouncementInformation;
 import org.iglooproject.basicapp.core.business.user.model.embeddable.UserPasswordInformation;
 import org.iglooproject.basicapp.core.business.user.model.embeddable.UserPasswordRecoveryRequest;
 import org.iglooproject.jpa.security.business.person.model.GenericSimpleUser;
 import org.iglooproject.spring.util.StringUtils;
 
-@Indexed
 @Bindable
 @Cacheable
 @Inheritance(strategy = InheritanceType.JOINED)

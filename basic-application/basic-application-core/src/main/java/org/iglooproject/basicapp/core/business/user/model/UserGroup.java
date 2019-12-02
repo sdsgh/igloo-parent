@@ -4,11 +4,9 @@ import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Indexed;
 import org.iglooproject.jpa.security.business.person.model.GenericUserGroup;
 
 @Entity
-@Indexed
 @Bindable
 @Cacheable
 public class UserGroup extends GenericUserGroup<UserGroup, User> {

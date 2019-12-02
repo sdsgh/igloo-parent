@@ -14,14 +14,12 @@ import javax.persistence.Transient;
 
 import org.bindgen.Bindable;
 import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.DocumentId;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
-
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.externallinkchecker.util.binding.CoreJpaExternalLinkCheckerBindings;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Maps;
 
 @Bindable
 @Cacheable
@@ -32,7 +30,6 @@ public class ExternalLinkWrapper extends GenericEntity<Long, ExternalLinkWrapper
 	
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Long id;
 	
 	@Column(nullable = false)

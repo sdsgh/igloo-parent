@@ -3,15 +3,8 @@ package org.iglooproject.basicapp.core.business.referencedata.model;
 import javax.persistence.Embedded;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Normalizer;
-import org.hibernate.search.annotations.SortableField;
 import org.iglooproject.basicapp.core.business.common.model.embeddable.LocalizedText;
 import org.iglooproject.jpa.more.business.referencedata.model.GenericReferenceData;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
-import org.iglooproject.jpa.search.util.HibernateSearchNormalizer;
 
 import com.querydsl.core.annotations.QueryInit;
 
@@ -31,7 +24,6 @@ public class ReferenceData<E extends ReferenceData<?>> extends GenericReferenceD
 	public static final String CODE_SORT = "codeSort";
 
 	@Embedded
-	@IndexedEmbedded(prefix = LABEL_PREFIX)
 	@QueryInit("*")
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private LocalizedText label;
@@ -58,9 +50,6 @@ public class ReferenceData<E extends ReferenceData<?>> extends GenericReferenceD
 	}
 
 	@Override
-	@Field(name = CODE, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
-	@Field(name = CODE_SORT, normalizer = @Normalizer(definition = HibernateSearchNormalizer.TEXT))
-	@SortableField(forField = CODE_SORT)
 	public String getCode() {
 		return null;
 	}

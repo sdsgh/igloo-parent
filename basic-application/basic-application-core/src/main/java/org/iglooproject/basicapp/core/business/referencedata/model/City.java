@@ -8,13 +8,11 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Indexed;
 import org.iglooproject.basicapp.core.business.common.model.PostalCode;
 import org.iglooproject.basicapp.core.business.common.model.embeddable.LocalizedText;
 
 @Entity
 @Bindable
-@Indexed
 @Cacheable
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"label_fr", "postalcode"}) })
 public class City extends ReferenceData<City> {

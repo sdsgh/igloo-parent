@@ -19,19 +19,9 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.hibernate.annotations.SortComparator;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Normalizer;
-import org.hibernate.search.annotations.SortableField;
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.commons.util.collections.CollectionUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
-import org.iglooproject.jpa.search.bridge.GenericEntityCollectionIdFieldBridge;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
-import org.iglooproject.jpa.search.util.HibernateSearchNormalizer;
 import org.iglooproject.jpa.security.business.authority.model.Authority;
 import org.iglooproject.jpa.security.business.person.util.AbstractPersonGroupComparator;
 import org.springframework.security.acls.model.Permission;
@@ -41,7 +31,6 @@ import com.google.common.collect.Sets;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 
-@Indexed
 @MappedSuperclass
 @Bindable
 @NaturalIdCache
@@ -60,21 +49,16 @@ public abstract class GenericUser<U extends GenericUser<U, G>, G extends Generic
 	
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Long id;
 	
 	@Column(nullable = false)
 	@NaturalId(mutable = true)
-	@Field(name = USERNAME, analyzer = @Analyzer(definition = HibernateSearchAnalyzer.TEXT))
-	@Field(name = USERNAME_SORT, normalizer = @Normalizer(definition = HibernateSearchNormalizer.TEXT))
-	@SortableField(forField = USERNAME_SORT)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private String username;
 	
 	@JsonIgnore
 	private String passwordHash = "*NO PASSWORD*";
 	
-	@Field(name = ACTIVE)
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private boolean active = true;
 	
@@ -103,7 +87,6 @@ public abstract class GenericUser<U extends GenericUser<U, G>, G extends Generic
 	@ManyToMany
 	@JoinTable(uniqueConstraints = { @UniqueConstraint(columnNames = { "persons_id", "groups_id" }) })
 	@SortComparator(AbstractPersonGroupComparator.class)
-	@Field(name = GROUPS, bridge = @FieldBridge(impl = GenericEntityCollectionIdFieldBridge.class), analyzer = @Analyzer(definition = HibernateSearchAnalyzer.KEYWORD))
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private Set<G> groups = Sets.newTreeSet(AbstractPersonGroupComparator.get());
 	

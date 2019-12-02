@@ -8,26 +8,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 
 @Entity
-@Indexed
 public class TestEntity extends GenericEntity<Long, TestEntity> {
 	private static final long serialVersionUID = 3827488123984866455L;
 
 	@Id
-	@DocumentId
 	@GeneratedValue
 	private Long id;
 	
-	@Field(analyzer = @Analyzer(definition = HibernateSearchAnalyzer.TEXT))
 	@Basic(optional = false)
 	private String label;
 	
@@ -37,14 +28,12 @@ public class TestEntity extends GenericEntity<Long, TestEntity> {
 	@Column
 	private String simplePropertyUpdateInterceptor;
 	
-	@Field
 	@Column
 	private String classicInterceptorSave;
 	
 	@Column
 	private String classicInterceptorFlushDirty;
 
-	@Field
 	@Column
 	private Date dateCreation;
 

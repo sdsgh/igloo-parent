@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.bindgen.Bindable;
-import org.hibernate.search.annotations.Indexed;
 import org.iglooproject.basicapp.core.business.announcement.model.atomic.AnnouncementType;
 import org.iglooproject.basicapp.core.business.announcement.model.embeddable.AnnouncementDate;
 import org.iglooproject.basicapp.core.business.common.model.embeddable.LocalizedText;
@@ -24,7 +23,6 @@ import com.google.common.base.MoreObjects;
 @Entity
 @Bindable
 @Cacheable
-@Indexed
 public class Announcement extends GenericEntity<Long, Announcement> {
 
 	private static final long serialVersionUID = 3430831126687319860L;

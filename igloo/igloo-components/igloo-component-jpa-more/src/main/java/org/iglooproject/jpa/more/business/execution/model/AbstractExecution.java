@@ -14,7 +14,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.bindgen.Bindable;
-import org.hibernate.annotations.Type;
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 
@@ -36,11 +35,9 @@ public abstract class AbstractExecution<E extends GenericEntity<Long, E>, ET ext
 	private String name;
 	
 	@Column
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String description;
 	
 	@Column
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String logOutput;
 	
 	@Column(nullable = false)

@@ -9,22 +9,12 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Version;
 
 import org.bindgen.Bindable;
-import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Normalizer;
-import org.hibernate.search.annotations.SortableField;
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.more.business.task.util.TaskResult;
 import org.iglooproject.jpa.more.business.task.util.TaskStatus;
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
-import org.iglooproject.jpa.search.util.HibernateSearchNormalizer;
 import org.springframework.core.style.ToStringCreator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,7 +48,6 @@ public class QueuedTaskHolder extends GenericEntity<Long, QueuedTaskHolder> {
 	private Long id;
 
 	@Column(nullable = false)
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	@SuppressWarnings("squid:S1845") // attribute name differs only by case on purpose
 	private String name;
 
@@ -77,12 +66,10 @@ public class QueuedTaskHolder extends GenericEntity<Long, QueuedTaskHolder> {
 
 	private Date endDate = null;
 
-	@Version
 	@Column(name = "optLock")
 	private int version;
 
 	@Column(nullable = false)
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String serializedTask;
 
 	@Column(nullable = false)
@@ -96,11 +83,9 @@ public class QueuedTaskHolder extends GenericEntity<Long, QueuedTaskHolder> {
 	private TaskResult result;
 
 	@Column
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String stackTrace;
 
 	@Column
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String report;
 
 	protected QueuedTaskHolder() {

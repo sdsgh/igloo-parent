@@ -17,7 +17,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.SortComparator;
-import org.hibernate.annotations.Type;
 import org.iglooproject.commons.util.collections.CollectionUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.security.business.authority.model.Authority;
@@ -67,7 +66,6 @@ public abstract class GenericUserGroup<G extends GenericUserGroup<G, PERSON>, PE
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<Authority> authorities = new LinkedHashSet<Authority>();
 	
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String description;
 	
 	@Column(nullable = false)

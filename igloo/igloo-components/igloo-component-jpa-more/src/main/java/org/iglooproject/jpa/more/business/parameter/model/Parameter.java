@@ -7,7 +7,6 @@ import javax.persistence.Id;
 
 import org.bindgen.Bindable;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.Type;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 
 @Entity
@@ -25,7 +24,6 @@ public class Parameter extends GenericEntity<Long, Parameter> {
 	private String name;
 
 	@Column
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType")
 	private String stringValue;
 	
 	public Parameter() {

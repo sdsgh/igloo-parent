@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import org.bindgen.Bindable;
-import org.hibernate.annotations.Type;
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.externallinkchecker.util.binding.CoreJpaExternalLinkCheckerBindings;
@@ -33,7 +32,6 @@ public class ExternalLinkWrapper extends GenericEntity<Long, ExternalLinkWrapper
 	private Long id;
 	
 	@Column(nullable = false)
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType") // SQL type "text" (unknown size)
 	private String url;
 	
 	@Column(nullable = false)
@@ -54,7 +52,6 @@ public class ExternalLinkWrapper extends GenericEntity<Long, ExternalLinkWrapper
 	private Date lastCheckDate;
 	
 	@Column
-	@Type(type = "org.iglooproject.jpa.hibernate.usertype.StringClobType") // SQL type "text" (unknown size)
 	private String failureAudit;
 	
 	protected ExternalLinkWrapper() {

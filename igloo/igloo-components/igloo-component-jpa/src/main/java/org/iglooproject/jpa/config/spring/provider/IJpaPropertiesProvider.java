@@ -65,5 +65,4 @@ public interface IJpaPropertiesProvider {
 	Properties getExtraProperties();
 
 	void setExtraProperties(Properties extraProperties);
-
 }

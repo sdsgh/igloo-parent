@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.scanner.Scanner;
+import org.hibernate.Interceptor;
 import org.hibernate.integrator.spi.Integrator;
 import org.iglooproject.jpa.business.generic.CoreJpaBusinessGenericPackage;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionConfigurationProvider;
@@ -37,7 +38,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -159,11 +159,12 @@ public abstract class AbstractJpaConfig {
 			@Qualifier("dataSource") DataSource dataSource,
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
 			List<IJpaPropertiesConfigurer> configurers, // use a list -> order is important and spring must inject ordered values
-			@Nullable PersistenceProvider persistenceProvider
+			@Nullable PersistenceProvider persistenceProvider,
+			List<Interceptor> interceptors // use a list -> order is important and spring must inject ordered values
 			) {
 		return JpaConfigUtils.entityManagerFactory(
 				dataSource, jpaPackagesScanProviders,
-				configurers, persistenceProvider);
+				configurers, persistenceProvider, interceptors);
 	}
 
 	@Bean

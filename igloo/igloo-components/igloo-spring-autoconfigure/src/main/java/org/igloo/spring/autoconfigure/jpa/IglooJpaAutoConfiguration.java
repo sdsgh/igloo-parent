@@ -10,6 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
+import org.hibernate.Interceptor;
 import org.hibernate.integrator.spi.Integrator;
 import org.igloo.spring.autoconfigure.flyway.IglooFlywayAutoConfiguration;
 import org.iglooproject.config.bootstrap.spring.annotations.IglooPropertySourcePriority;
@@ -128,9 +129,11 @@ public class IglooJpaAutoConfiguration {
 			@Qualifier("dataSource") DataSource dataSource,
 			List<IJpaPropertiesConfigurer> configurers,
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
-			@Nullable PersistenceProvider persistenceProvider
+			@Nullable PersistenceProvider persistenceProvider,
+			List<Interceptor> interceptors
 			) {
-		return JpaConfigUtils.entityManagerFactory(dataSource, jpaPackagesScanProviders, configurers, persistenceProvider);
+		return JpaConfigUtils.entityManagerFactory(dataSource, jpaPackagesScanProviders, configurers,
+				persistenceProvider, interceptors);
 	}
 
 	@Bean

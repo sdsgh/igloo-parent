@@ -5,17 +5,22 @@ import static com.google.common.base.Strings.emptyToNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.naming.NamingException;
 import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
+import org.hibernate.Interceptor;
+import org.hibernate.cfg.AvailableSettings;
 import org.iglooproject.jpa.business.generic.service.ITransactionalAspectAwareService;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionJndiConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionPoolConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.JpaPackageScanProvider;
 import org.iglooproject.jpa.exception.ServiceException;
+import org.iglooproject.jpa.hibernate.interceptor.AbstractChainableInterceptor;
+import org.iglooproject.jpa.hibernate.interceptor.ChainedInterceptor;
 import org.iglooproject.jpa.integration.api.IJpaPropertiesConfigurer;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
@@ -43,7 +48,8 @@ public final class JpaConfigUtils {
 			DataSource dataSource,
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
 			List<IJpaPropertiesConfigurer> configurers,
-			PersistenceProvider persistenceProvider) {
+			PersistenceProvider persistenceProvider,
+			List<Interceptor> interceptors) {
 		Properties properties = new Properties();
 		for (IJpaPropertiesConfigurer propertiesConfigurer : configurers) {
 			propertiesConfigurer.configure(properties);
@@ -57,6 +63,27 @@ public final class JpaConfigUtils {
 		
 		if (persistenceProvider != null) {
 			entityManagerFactoryBean.setPersistenceProvider(persistenceProvider);
+		}
+		
+		if (interceptors != null && ! interceptors.isEmpty()) {
+			Interceptor firstInterceptor = interceptors.get(0);
+			// only AbstractChainableInterceptor can be combined in a ChainedInterceptor
+			if (interceptors.size() > 1) {
+				// if we have only one item, it does not need to be wrapped
+				properties.put(AvailableSettings.INTERCEPTOR, firstInterceptor);
+			} else {
+				// if we have multiple items, all must be an AbstractChainableInterceptor
+				ChainedInterceptor interceptor = new ChainedInterceptor();
+				try {
+					for (Interceptor i : interceptors) {
+						interceptor.add((AbstractChainableInterceptor) i);
+					}
+				} catch (ClassCastException e) {
+					throw new IllegalStateException(String.format(
+							"Multiple interceptor only supports AbstractChainableInterceptor ; provided [%s]",
+							interceptors.stream().map(Object::toString).collect(Collectors.joining(", "))));
+				}
+			}
 		}
 		
 		return entityManagerFactoryBean;

@@ -202,6 +202,10 @@ public final class JpaConfigUtils {
 		
 		properties.put(EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER, configuration.getIntegratorProvider());
 		
+		if (configuration.getInterceptor() != null) {
+			properties.put(AvailableSettings.INTERCEPTOR, configuration.getInterceptor());
+		}
+		
 		// Override properties
 		properties.putAll(configuration.getDefaultExtraProperties());
 		properties.putAll(configuration.getExtraProperties());

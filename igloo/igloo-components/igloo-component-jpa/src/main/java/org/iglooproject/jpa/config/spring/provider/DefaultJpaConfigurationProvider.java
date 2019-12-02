@@ -9,6 +9,7 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.Interceptor;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cache.spi.RegionFactory;
@@ -100,6 +101,9 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 
 	@Autowired(required = false)
 	private List<Integrator> integrators;
+
+	@Autowired(required = false)
+	private Interceptor interceptor;
 
 	@Override
 	public List<JpaPackageScanProvider> getJpaPackageScanProviders() {
@@ -264,6 +268,11 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 			integratorsSnapshot.addAll(integrators);
 		}
 		return () -> integratorsSnapshot;
+	}
+
+	@Override
+	public Interceptor getInterceptor() {
+		return interceptor;
 	}
 
 }

@@ -3,6 +3,7 @@ package org.iglooproject.jpa.config.spring.provider;
 import java.util.Properties;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.Interceptor;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cache.spi.RegionFactory;
@@ -68,5 +69,7 @@ public interface IJpaPropertiesProvider {
 	void setExtraProperties(Properties extraProperties);
 
 	public IntegratorProvider getIntegratorProvider();
+
+	public Interceptor getInterceptor();
 
 }

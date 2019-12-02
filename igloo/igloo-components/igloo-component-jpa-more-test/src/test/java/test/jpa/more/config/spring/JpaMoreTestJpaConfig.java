@@ -1,10 +1,7 @@
 package test.jpa.more.config.spring;
 
-import javax.persistence.spi.PersistenceProvider;
-
 import org.hibernate.Interceptor;
 import org.iglooproject.jpa.config.spring.provider.JpaPackageScanProvider;
-import org.iglooproject.jpa.hibernate.ejb.InterceptorAwareHibernatePersistenceProvider;
 import org.iglooproject.jpa.hibernate.interceptor.ChainedInterceptor;
 import org.iglooproject.jpa.more.config.spring.AbstractConfiguredJpaMoreJpaConfig;
 import org.springframework.context.annotation.Bean;
@@ -22,14 +19,10 @@ import test.jpa.more.business.util.transaction.service.ITestTransactionSynchroni
 @ComponentScan(basePackageClasses = ITestTransactionSynchronizationTaskService.class)
 public class JpaMoreTestJpaConfig extends AbstractConfiguredJpaMoreJpaConfig {
 
+	@Override
 	@Bean
 	public JpaPackageScanProvider applicationJpaPackageScanProvider() {
 		return new JpaPackageScanProvider(JpaMoreTestBusinessPackage.class.getPackage());
-	}
-	
-	@Bean
-	public PersistenceProvider persistenceProvider() {
-		return new InterceptorAwareHibernatePersistenceProvider();
 	}
 	
 	@Bean

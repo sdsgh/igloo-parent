@@ -19,7 +19,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
-import org.springframework.util.Assert;
 
 @Embeddable
 @MappedSuperclass
@@ -58,16 +57,24 @@ public class GenericEntityReference<K extends Comparable<K> & Serializable, E ex
 	
 	@SuppressWarnings("unchecked")
 	public GenericEntityReference(E entity) {
-		Assert.notNull(entity, "The referenced entity must not be null");
-		Assert.state(!entity.isNew(), "The referenced entity must not be transient");
+		if (entity == null) {
+			throw new IllegalStateException("The referenced entity must not be null");
+		}
+		if (entity.isNew()) {
+			throw new IllegalStateException("The referenced entity must not be transient");
+		}
 		this.type = (Class<? extends E>)Hibernate.getClass(entity);
 		this.id = entity.getId();
 	}
 	
 	public GenericEntityReference(Class<? extends E> entityClass, K entityId) {
 		super();
-		Assert.notNull(entityClass, "entityClass must not be null");
-		Assert.notNull(entityId, "entityId must not be null");
+		if (entityClass == null) {
+			throw new IllegalStateException("entityClass must not be null");
+		}
+		if (entityId == null) {
+			throw new IllegalStateException("entityIdCollection must not be null");
+		}
 		this.type = entityClass;
 		this.id = entityId;
 	}

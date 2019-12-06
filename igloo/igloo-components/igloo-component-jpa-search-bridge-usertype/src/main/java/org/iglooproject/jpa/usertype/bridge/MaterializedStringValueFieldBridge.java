@@ -1,4 +1,4 @@
-package org.iglooproject.jpa.search.bridge;
+package org.iglooproject.jpa.usertype.bridge;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;

@@ -14,12 +14,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
-import org.springframework.util.Assert;
+import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
-import org.iglooproject.jpa.search.util.HibernateSearchAnalyzer;
 
 public class GenericEntityCollectionReference<K extends Comparable<K> & Serializable, E extends GenericEntity<K, ?>>
 		implements Serializable {
@@ -37,7 +35,9 @@ public class GenericEntityCollectionReference<K extends Comparable<K> & Serializ
 			GenericEntityCollectionReference<K, E> of(Class<E> entityClass, Collection<? extends E> entityCollection) {
 		List<K> entityIdCollection = Lists.newArrayListWithExpectedSize(entityCollection.size());
 		for (E entity : entityCollection) {
-			Assert.state(!entity.isNew(), "None of the referenced entities must be transient");
+			if (entity.isNew()) {
+				throw new IllegalStateException("None of the referenced entities must be transient");
+			}
 			entityIdCollection.add(entity.getId());
 		}
 		return new GenericEntityCollectionReference<>(entityClass, entityIdCollection);
@@ -48,7 +48,9 @@ public class GenericEntityCollectionReference<K extends Comparable<K> & Serializ
 			Class<E> entityClass, Collection<? extends E> entityCollection) {
 		List<Object> entityIdCollection = Lists.newArrayListWithExpectedSize(entityCollection.size());
 		for (E entity : entityCollection) {
-			Assert.state(!entity.isNew(), "None of the referenced entities must be transient");
+			if (entity.isNew()) {
+				throw new IllegalStateException("None of the referenced entities must be transient");
+			}
 			entityIdCollection.add(entity.getId());
 		}
 		return new GenericEntityCollectionReference(entityClass, entityIdCollection);
@@ -68,8 +70,12 @@ public class GenericEntityCollectionReference<K extends Comparable<K> & Serializ
 	
 	public GenericEntityCollectionReference(Class<? extends E> entityClass, Collection<K> entityIdCollection) {
 		super();
-		Assert.notNull(entityClass, "entityClass must not be null");
-		Assert.notNull(entityIdCollection, "entityIdCollection must not be null");
+		if (entityClass == null) {
+			throw new IllegalStateException("entityClass must not be null");
+		}
+		if (entityIdCollection == null) {
+			throw new IllegalStateException("entityIdCollection must not be null");
+		}
 		this.entityClass = entityClass;
 		this.entityIdList = Collections.unmodifiableList(Lists.newArrayList(entityIdCollection));
 	}

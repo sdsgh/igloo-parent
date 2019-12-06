@@ -1,4 +1,4 @@
-package org.iglooproject.jpa.search.util;
+package org.iglooproject.jpa.search.query;
 
 import java.util.Collection;
 

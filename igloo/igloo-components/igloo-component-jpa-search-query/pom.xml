@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.iglooproject.components</groupId>
+		<artifactId>igloo-components</artifactId>
+		<version>1.5-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>igloo-component-jpa-search-query</artifactId>
+	
+	<name>Igloo - Component - JPA - Search</name>
+	<description>JPA / Hibernate Search Query</description>
+
+	<dependencies>
+	
+		<!-- hibernate-search -->
+		
+		<dependency>
+			<groupId>org.iglooproject.dependencies</groupId>
+			<artifactId>igloo-dependency-hibernate-search</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-lucene-analyzers</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<!--
+		Scope provided is necessary because test helpers are
+		included in artifact (AbstractTestCase and
+		EntityManagerExecutionListener) so we need to compile them,
+		but we don't want to pollute dependencies of dependent
+		projects.
+		-->
+		<dependency>
+			<groupId>org.iglooproject.dependencies</groupId>
+			<artifactId>igloo-dependency-test</artifactId>
+			<type>pom</type>
+		</dependency>
+		
+	</dependencies>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss</id>
+			<name>JBoss Maven Repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>

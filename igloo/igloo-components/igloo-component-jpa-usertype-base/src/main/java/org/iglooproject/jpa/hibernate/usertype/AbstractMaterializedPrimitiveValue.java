@@ -1,8 +1,7 @@
 package org.iglooproject.jpa.hibernate.usertype;
 
 import java.io.Serializable;
-
-import org.iglooproject.functional.SerializableFunction2;
+import java.util.function.Function;
 
 /**
  * A value that must be stored as a primitive type, but has a strong business significance and must thus be
@@ -16,8 +15,9 @@ public abstract class AbstractMaterializedPrimitiveValue<P extends Comparable<P>
 	
 	private static final long serialVersionUID = 1388663091843463782L;
 	
-	public static <P extends Comparable<P>> SerializableFunction2<AbstractMaterializedPrimitiveValue<P, ?>, P> materializedToPrimitive() {
-		return v -> v == null ? null : v.getValue();
+	@SuppressWarnings("unchecked")
+	public static <P extends Comparable<P>> Function<AbstractMaterializedPrimitiveValue<P, ?>, P> materializedToPrimitive() {
+		return (Serializable & Function<AbstractMaterializedPrimitiveValue<P, ?>, P>) v -> v == null ? null : v.getValue();
 	}
 	
 	private final P value;

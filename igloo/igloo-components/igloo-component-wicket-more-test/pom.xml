@@ -33,6 +33,13 @@
 			<type>pom</type>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-functional</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 		<!--
 		Nécessaire car déclaré provided dans wiquery, ce qui ne suffit pas
 		See http://code.google.com/p/wiquery/issues/detail?id=148

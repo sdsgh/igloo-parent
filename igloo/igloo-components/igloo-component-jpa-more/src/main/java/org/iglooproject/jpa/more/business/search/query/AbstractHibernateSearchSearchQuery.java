@@ -27,7 +27,7 @@ import org.iglooproject.jpa.more.business.sort.ISort;
 import org.iglooproject.jpa.more.business.sort.SortUtils;
 import org.iglooproject.jpa.search.bridge.GenericEntityIdFieldBridge;
 import org.iglooproject.jpa.search.bridge.NullEncodingGenericEntityIdFieldBridge;
-import org.iglooproject.jpa.search.util.SortFieldUtil;
+import org.iglooproject.jpa.search.query.SortFieldUtil;
 import org.iglooproject.spring.util.lucene.search.LuceneUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

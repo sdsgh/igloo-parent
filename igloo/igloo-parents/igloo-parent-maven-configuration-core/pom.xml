@@ -45,6 +45,7 @@
 		<!-- http://hibernate.org/orm/releases/5.4/ -->
 		<igloo.hibernate.version>5.4.10.Final</igloo.hibernate.version>
 		<igloo.hibernate-validator.version>5.4.3.Final</igloo.hibernate-validator.version>
+		<igloo.javax-persistence-api.version>2.2</igloo.javax-persistence-api.version> <!-- keep synchronized with hibernate -->
 		<!-- both needed by mockito and hibernate; we keep hibernate version -->
 		<igloo.byte-buddy.version>1.10.2</igloo.byte-buddy.version>
 		<igloo.jboss-logging.version>3.4.1.Final</igloo.jboss-logging.version>
@@ -683,12 +684,6 @@
 						<groupId>org.hibernate</groupId>
 						<artifactId>hibernate-core</artifactId>
 						<version>${igloo.hibernate.version}</version>
-						<exclusions>
-							<exclusion>
-								<artifactId>xml-apis</artifactId>
-								<groupId>xml-apis</groupId>
-							</exclusion>
-						</exclusions>
 					</dependency>
 
 					<dependency>
@@ -723,12 +718,6 @@
 						<groupId>org.jboss.logging</groupId>
 						<artifactId>jboss-logging</artifactId>
 						<version>${igloo.jboss-logging.version}</version>
-						<exclusions>
-							<exclusion>
-								<artifactId>xml-apis</artifactId>
-								<groupId>xml-apis</groupId>
-							</exclusion>
-						</exclusions>
 					</dependency>
 
 				<!-- QueryDSL -->
@@ -1032,13 +1021,6 @@
 					<groupId>org.apache.poi</groupId>
 					<artifactId>poi-ooxml</artifactId>
 					<version>${igloo.poi.version}</version>
-					<exclusions>
-						<!-- xml-apis may result in class loading issues and is provided by modern JREs -->
-						<exclusion>
-							<groupId>xml-apis</groupId>
-							<artifactId>xml-apis</artifactId>
-						</exclusion>
-					</exclusions>
 				</dependency>
 
 			<!-- OpenCSV -->

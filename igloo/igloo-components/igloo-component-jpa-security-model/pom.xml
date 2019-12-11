@@ -8,10 +8,9 @@
 		<version>1.5-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>igloo-component-jpa-model</artifactId>
+	<artifactId>igloo-component-jpa-security-model</artifactId>
 	
-	<name>Igloo - Component - JPA - Model</name>
-	<description>JPA / Base model</description>
+	<name>Igloo - Component - JPA - Spring Security (db model)</name>
 
 	<dependencyManagement>
 		<dependencies>
@@ -33,37 +32,37 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<!-- JPA analyzer/normalizer names -->
+		
+		<!-- Igloo dependencies -->
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-jpa-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-notification-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- Permission, ... -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-acl</artifactId>
+		</dependency>
+		
+		<!-- JPA annotations/analyzer/normalizer names -->
 		<dependency>
 			<groupId>org.iglooproject.components</groupId>
 			<artifactId>igloo-component-jpa-search-annotations</artifactId>
 			<version>${project.version}</version>
 			<optional>true</optional>
 		</dependency>
-		
-		<!-- LocaleUtils -->
 		<dependency>
 			<groupId>org.iglooproject.components</groupId>
-			<artifactId>igloo-component-commons</artifactId>
+			<artifactId>igloo-component-jpa-search-bridge-base</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		
-		<!-- equals/toString helpers -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		
-		<!-- collection handling, ordering -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		
-		<!-- hibernate -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -74,10 +73,6 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search-engine</artifactId>
 			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>javax.persistence-api</artifactId>
 		</dependency>
 		
 		<!-- querydsl generation -->
@@ -100,17 +95,6 @@
 			<optional>true</optional>
 		</dependency>
 		
-		<!-- jackson annotations -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-		</dependency>
-		
-		<!-- slf4j -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
 	</dependencies>
 	
 	<build>
@@ -119,18 +103,7 @@
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<!-- only in annotations -->
-					<ignoredUnusedDeclaredDependencies>
-						<ignoredUnusedDeclaredDependency>org.iglooproject.components:igloo-component-jpa-search-annotations</ignoredUnusedDeclaredDependency>
-						<ignoredUnusedDeclaredDependency>org.hibernate:hibernate-search-orm</ignoredUnusedDeclaredDependency>
-					</ignoredUnusedDeclaredDependencies>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
-
+	
 </project>

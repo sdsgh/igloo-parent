@@ -1,4 +1,4 @@
-package org.iglooproject.spring.notification.model;
+package org.iglooproject.spring.notification.util;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -6,6 +6,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.iglooproject.commons.util.context.IExecutionContext;
 import org.iglooproject.commons.util.context.IExecutionContext.ITearDownHandle;
 import org.iglooproject.spring.notification.exception.NotificationContentRenderingException;
+import org.iglooproject.spring.notification.model.INotificationContentDescriptor;
+import org.iglooproject.spring.notification.model.INotificationRecipient;
 
 public abstract class AbstractExecutionContextNotificationContentDescriptorWrapper implements INotificationContentDescriptor {
 	

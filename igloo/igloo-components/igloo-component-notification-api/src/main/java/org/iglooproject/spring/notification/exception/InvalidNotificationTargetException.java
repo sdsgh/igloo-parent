@@ -1,8 +1,6 @@
 package org.iglooproject.spring.notification.exception;
 
-import org.springframework.core.NestedRuntimeException;
-
-public class InvalidNotificationTargetException extends NestedRuntimeException {
+public class InvalidNotificationTargetException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

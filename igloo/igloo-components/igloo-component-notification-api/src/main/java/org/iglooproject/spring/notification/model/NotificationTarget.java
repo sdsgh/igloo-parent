@@ -11,7 +11,6 @@ import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.iglooproject.spring.notification.exception.InvalidNotificationTargetException;
-import org.iglooproject.spring.util.StringUtils;
 
 import com.google.common.base.Splitter;
 
@@ -51,11 +50,11 @@ public class NotificationTarget implements Serializable {
 	
 	private static InternetAddress getInternetAddress(String email, String fullName, Charset charset) throws InvalidNotificationTargetException {
 		try {
-			if (!StringUtils.hasText(email)) {
+			if (email == null || email.trim().length() == 0) {
 				throw new AddressException("Email address is empty");
 			}
 			
-			List<String> emailParts = Splitter.on('@').omitEmptyStrings().trimResults().splitToList(StringUtils.lowerCase(email));
+			List<String> emailParts = Splitter.on('@').omitEmptyStrings().trimResults().splitToList(email.toLowerCase());
 			if (emailParts.size() != 2) {
 				throw new AddressException("Invalid email address", email);
 			}
@@ -66,7 +65,7 @@ public class NotificationTarget implements Serializable {
 				internetAddress.validate();
 				return internetAddress;
 			} catch (UnsupportedEncodingException e) {
-				throw new AddressException(String.format("Unable to parse the address %1$s <$2$s>: invalid encoding", fullName, idnEmail));
+				throw new AddressException(String.format("Unable to parse the address %1$s <%2$s>: invalid encoding", fullName, idnEmail));
 			}
 		} catch (AddressException e) {
 			throw new InvalidNotificationTargetException(
@@ -81,7 +80,7 @@ public class NotificationTarget implements Serializable {
 			return "<null>";
 		}
 		StringBuilder sb = new StringBuilder();
-		if (StringUtils.hasText(address.getPersonal())) {
+		if (address.getPersonal() != null && address.getPersonal().trim().length() > 0) {
 			sb.append(address.getPersonal()).append(" ");
 		}
 		sb.append("<").append(address.getAddress()).append(">");

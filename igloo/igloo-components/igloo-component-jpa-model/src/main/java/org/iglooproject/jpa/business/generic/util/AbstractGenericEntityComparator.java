@@ -3,12 +3,10 @@ package org.iglooproject.jpa.business.generic.util;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.springframework.util.Assert;
-
-import com.google.common.collect.Ordering;
-
 import org.iglooproject.commons.util.ordering.AbstractNullSafeComparator;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
+
+import com.google.common.collect.Ordering;
 
 /**
  * A {@link GenericEntity} comparator that compares IDs.
@@ -40,7 +38,9 @@ public abstract class AbstractGenericEntityComparator<K extends Comparable<K> & 
 	 */
 	public AbstractGenericEntityComparator(boolean nullIsLow, Comparator<? super K> keyComparator) {
 		super(nullIsLow);
-		Assert.notNull(keyComparator, "[Assertion failed] - this argument is required; it must not be null");
+		if (keyComparator == null) {
+			throw new IllegalStateException("[Assertion failed] - this argument is required; it must not be null");
+		}
 		this.keyComparator = keyComparator;
 	}
 	

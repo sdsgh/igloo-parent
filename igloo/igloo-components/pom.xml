@@ -26,6 +26,8 @@
 		
 		<module>igloo-component-commons</module>
 		<module>igloo-component-functional</module>
+
+		<module>igloo-component-notification-api</module>
 		<module>igloo-component-spring</module>
 		<module>igloo-component-spring-bootstrap-config</module>
 		<module>igloo-component-lucene-analyzers</module>
@@ -45,6 +47,7 @@
 		
 		<module>igloo-component-jpa-more</module>
 		<module>igloo-component-jpa-more-test</module>
+		<module>igloo-component-jpa-security-model</module>
 		<module>igloo-component-jpa-security</module>
 		<module>igloo-component-jpa-externallinkchecker</module>
 		

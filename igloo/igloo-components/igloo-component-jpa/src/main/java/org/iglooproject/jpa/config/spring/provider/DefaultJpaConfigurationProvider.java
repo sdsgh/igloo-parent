@@ -1,27 +1,17 @@
 package org.iglooproject.jpa.config.spring.provider;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Resource;
-import javax.persistence.spi.PersistenceProvider;
-import javax.sql.DataSource;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.jpa.boot.spi.IntegratorProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvider {
-
-	@Autowired
-	private List<JpaPackageScanProvider> jpaPackageScanProviders;
+public class DefaultJpaConfigurationProvider implements IJpaPropertiesProvider {
 
 	@Value("${db.dialect}")
 	private Class<Dialect> dialect;
@@ -50,9 +40,6 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 	@Value("${hibernate.search.indexing_strategy:}") // Defaults to an empty string
 	private String hibernateSearchIndexingStrategy;
 
-	@Value("#{dataSource}")
-	private DataSource dataSource;
-
 	@Value("${hibernate.ehCache.configurationLocation}")
 	private String ehCacheConfiguration;
 
@@ -64,9 +51,6 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 
 	@Value("${hibernate.queryCache.enabled}")
 	private boolean queryCacheEnabled;
-
-	@Autowired(required=false)
-	private PersistenceProvider persistenceProvider;
 
 	@Value("${javax.persistence.validation.mode}")
 	private String validationMode;
@@ -97,14 +81,6 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 
 	@Resource(name = "hibernateExtraProperties")
 	private Properties extraProperties;
-
-	@Autowired(required = false)
-	private List<Integrator> integrators;
-
-	@Override
-	public List<JpaPackageScanProvider> getJpaPackageScanProviders() {
-		return jpaPackageScanProviders;
-	}
 
 	@Override
 	public Class<Dialect> getDialect() {
@@ -147,11 +123,6 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 	}
 
 	@Override
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	@Override
 	public String getEhCacheConfiguration() {
 		return ehCacheConfiguration;
 	}
@@ -169,11 +140,6 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 	@Override
 	public boolean isQueryCacheEnabled() {
 		return queryCacheEnabled;
-	}
-
-	@Override
-	public PersistenceProvider getPersistenceProvider() {
-		return persistenceProvider;
 	}
 
 	@Override
@@ -254,16 +220,6 @@ public class DefaultJpaConfigurationProvider implements IJpaConfigurationProvide
 	@Override
 	public void setExtraProperties(Properties extraProperties) {
 		this.extraProperties = extraProperties;
-	}
-
-	@Override
-	public IntegratorProvider getIntegratorProvider() {
-		// do a snapshot; this method is called once during context startup.
-		final List<Integrator> integratorsSnapshot = new ArrayList<>();
-		if (integrators != null) {
-			integratorsSnapshot.addAll(integrators);
-		}
-		return () -> integratorsSnapshot;
 	}
 
 }

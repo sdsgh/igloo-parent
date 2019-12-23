@@ -1,8 +1,5 @@
 package org.iglooproject.jpa.search.dao;
 
-import static org.iglooproject.jpa.property.JpaPropertyIds.HIBERNATE_SEARCH_REINDEX_BATCH_SIZE;
-import static org.iglooproject.jpa.property.JpaPropertyIds.HIBERNATE_SEARCH_REINDEX_LOAD_THREADS;
-
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -10,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.IntSupplier;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -40,43 +38,47 @@ import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
-import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
 import org.iglooproject.jpa.exception.ServiceException;
-import org.iglooproject.jpa.hibernate.analyzers.LuceneEmbeddedAnalyzerRegistry;
-import org.iglooproject.spring.property.service.IPropertyService;
+import org.iglooproject.jpa.search.analyzers.LuceneEmbeddedAnalyzerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import com.google.common.collect.Maps;
 
-@Repository("hibernateSearchDao")
 public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(HibernateSearchDaoImpl.class);
 	
-	@Autowired
-	private IPropertyService propertyService;
+	private final IntSupplier reindexBatchSize;
 	
-	@Autowired
-	private IJpaPropertiesProvider jpaPropertiesProvider;
+	private final IntSupplier reindexLoadThreads;
 	
 	/**
 	 * With Elasticsearch used as backend, provides client-side Lucene analyzers. 
 	 */
-	@Autowired(required = false)
 	private LuceneEmbeddedAnalyzerRegistry luceneEmbeddedAnalyzerRegistry;
+	
+	private HibernateSearchBackend backend;
 	
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	public HibernateSearchDaoImpl() {
+	public HibernateSearchDaoImpl(boolean elasticSearch,
+			IntSupplier reindexBatchSize, IntSupplier reindexLoadThreads,
+			LuceneEmbeddedAnalyzerRegistry luceneEmbeddedAnalyzerRegistry) {
+		if (elasticSearch) {
+			this.backend = HibernateSearchBackend.ELASTIC_SEARCH;
+		} else {
+			this.backend = HibernateSearchBackend.LUCENE;
+		}
+		this.reindexBatchSize = reindexBatchSize;
+		this.reindexLoadThreads = reindexLoadThreads;
+		this.luceneEmbeddedAnalyzerRegistry = luceneEmbeddedAnalyzerRegistry;
 	}
 	
 	@Override
 	public Analyzer getAnalyzer(String analyzerName) {
-		if (jpaPropertiesProvider.isHibernateSearchElasticSearchEnabled()) {
+		if (usesElasticSearchBackend()) {
 			if ("default".equals(analyzerName)) {
 				return PassThroughAnalyzer.INSTANCE;
 			} else {
@@ -96,7 +98,7 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 		ExtendedSearchIntegrator searchIntegrator = searchFactory.unwrap(ExtendedSearchIntegrator.class);
 		IndexedTypeIdentifier indexedType = getIndexBoundType(entityType, searchIntegrator);
 		
-		if (jpaPropertiesProvider.isHibernateSearchElasticSearchEnabled()) {
+		if (usesElasticSearchBackend()) {
 			ScopedElasticsearchAnalyzerReference scopedAnalyzer = (ScopedElasticsearchAnalyzerReference) searchIntegrator.getAnalyzerReference(indexedType);
 			try {
 				// these properties are package protected ! Use a bypass !
@@ -158,8 +160,8 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 	
 	protected void reindexClasses(FullTextEntityManager fullTextEntityManager, Set<Class<?>> entityClasses)
 			throws InterruptedException {
-		int batchSize = propertyService.get(HIBERNATE_SEARCH_REINDEX_BATCH_SIZE);
-		int loadThreads = propertyService.get(HIBERNATE_SEARCH_REINDEX_LOAD_THREADS);
+		int batchSize = reindexBatchSize.getAsInt();
+		int loadThreads = reindexLoadThreads.getAsInt();
 		
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("Targets for indexing job: {}", entityClasses);
@@ -339,7 +341,7 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 			if (throwException) {
 				throw new IllegalStateException(message);
 			} else {
-				if (jpaPropertiesProvider.isHibernateSearchElasticSearchEnabled()) {
+				if (usesElasticSearchBackend()) {
 					// error if needed (elasticsearch mode)
 					LOGGER.error(message);
 				} else {
@@ -351,5 +353,14 @@ public class HibernateSearchDaoImpl implements IHibernateSearchDao {
 		} else {
 			return true;
 		}
+	}
+
+	private boolean usesElasticSearchBackend() {
+		return HibernateSearchBackend.ELASTIC_SEARCH.equals(backend);
+	}
+
+	private enum HibernateSearchBackend {
+		LUCENE,
+		ELASTIC_SEARCH
 	}
 }

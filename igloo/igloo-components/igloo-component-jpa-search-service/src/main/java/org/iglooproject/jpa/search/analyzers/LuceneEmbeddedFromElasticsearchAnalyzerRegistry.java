@@ -1,4 +1,4 @@
-package org.iglooproject.jpa.hibernate.analyzers;
+package org.iglooproject.jpa.search.analyzers;
 
 import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
 
@@ -28,7 +28,6 @@ import org.hibernate.search.engine.impl.TokenizerChain;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Maps;
 
@@ -40,8 +39,11 @@ public class LuceneEmbeddedFromElasticsearchAnalyzerRegistry implements LuceneEm
 
 	private Map<String, Analyzer> analyzers = Maps.newHashMap();
 
-	@Autowired
-	private EntityManagerFactory entityManagerFactory;
+	private final EntityManagerFactory entityManagerFactory;
+
+	public LuceneEmbeddedFromElasticsearchAnalyzerRegistry(EntityManagerFactory entityManagerFactory) {
+		this.entityManagerFactory = entityManagerFactory;
+	}
 
 	@Override
 	public Analyzer getAnalyzer(String analyzerName) {

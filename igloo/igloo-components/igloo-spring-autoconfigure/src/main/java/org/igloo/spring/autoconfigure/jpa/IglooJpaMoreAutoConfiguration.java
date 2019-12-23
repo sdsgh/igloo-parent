@@ -1,13 +1,10 @@
 package org.igloo.spring.autoconfigure.jpa;
 
-import org.iglooproject.jpa.config.spring.JpaConfigUtils;
-import org.iglooproject.jpa.config.spring.provider.IJpaConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.JpaPackageScanProvider;
 import org.iglooproject.jpa.more.business.CoreJpaMoreBusinessPackage;
 import org.iglooproject.jpa.more.business.search.query.HibernateSearchLuceneQueryFactoryImpl;
 import org.iglooproject.jpa.more.business.search.query.IHibernateSearchLuceneQueryFactory;
 import org.iglooproject.jpa.more.config.spring.JpaMoreApplicationPropertyRegistryConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -16,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -29,14 +25,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 	JpaMoreApplicationPropertyRegistryConfig.class
 })
 public class IglooJpaMoreAutoConfiguration {
-
-	@Autowired
-	protected IJpaConfigurationProvider jpaConfigurationProvider;
-
-	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-		return JpaConfigUtils.entityManagerFactory(jpaConfigurationProvider);
-	}
 
 	@Bean
 	public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {

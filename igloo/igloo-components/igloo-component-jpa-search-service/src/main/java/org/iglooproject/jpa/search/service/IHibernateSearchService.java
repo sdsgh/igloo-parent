@@ -7,10 +7,9 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.iglooproject.jpa.business.generic.model.GenericEntity;
 import org.iglooproject.jpa.business.generic.model.GenericEntityReference;
-import org.iglooproject.jpa.business.generic.service.ITransactionalAspectAwareService;
 import org.iglooproject.jpa.exception.ServiceException;
 
-public interface IHibernateSearchService extends ITransactionalAspectAwareService {
+public interface IHibernateSearchService {
 
 	void reindexAll() throws ServiceException;
 

@@ -1,8 +1,10 @@
 package org.iglooproject.test.search.config.spring;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.iglooproject.config.bootstrap.spring.annotations.IglooPropertySourcePriority;
-import org.iglooproject.jpa.hibernate.analyzers.LuceneEmbeddedAnalyzerRegistry;
-import org.iglooproject.jpa.hibernate.analyzers.LuceneEmbeddedFromElasticsearchAnalyzerRegistry;
+import org.iglooproject.jpa.search.analyzers.LuceneEmbeddedAnalyzerRegistry;
+import org.iglooproject.jpa.search.analyzers.LuceneEmbeddedFromElasticsearchAnalyzerRegistry;
 import org.iglooproject.spring.config.spring.AbstractApplicationConfig;
 import org.iglooproject.test.config.spring.ConfigurationPropertiesUrlConstants;
 import org.iglooproject.test.config.spring.JpaTestApplicationPropertyConfig;
@@ -35,8 +37,8 @@ import org.springframework.context.annotation.PropertySource;
 public class JpaSearchTestConfig extends AbstractApplicationConfig {
 
 	@Bean
-	LuceneEmbeddedAnalyzerRegistry luceneEmbedddedAnalyzerRegistry() {
-		return new LuceneEmbeddedFromElasticsearchAnalyzerRegistry();
+	LuceneEmbeddedAnalyzerRegistry luceneEmbedddedAnalyzerRegistry(EntityManagerFactory entityManagerFactory) {
+		return new LuceneEmbeddedFromElasticsearchAnalyzerRegistry(entityManagerFactory);
 	}
 
 }

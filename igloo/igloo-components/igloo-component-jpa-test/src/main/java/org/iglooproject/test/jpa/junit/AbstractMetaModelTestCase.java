@@ -21,7 +21,7 @@ import org.hibernate.tool.schema.internal.Helper;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
 import org.hibernate.tool.schema.internal.exec.JdbcContext;
 import org.hibernate.tool.schema.spi.SchemaManagementTool;
-import org.iglooproject.jpa.config.spring.provider.IJpaConfigurationProvider;
+import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
 import org.iglooproject.jpa.hibernate.integrator.spi.MetadataRegistryIntegrator;
 import org.iglooproject.jpa.util.EntityManagerUtils;
 import org.iglooproject.test.jpa.util.bean.DynaBeanConverter;
@@ -40,7 +40,7 @@ public abstract class AbstractMetaModelTestCase extends AbstractTestCase {
 	protected EntityManagerUtils entityManagerUtils;
 
 	@Autowired
-	protected IJpaConfigurationProvider configurationProvider;
+	protected IJpaPropertiesProvider configurationProvider;
 
 	@Autowired
 	protected MetadataRegistryIntegrator metadataRegistryIntegrator;

@@ -4,8 +4,9 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
-/*
- * Integrator used to register the metadata object required by the BasicApplicationSqlUpdateScriptMain.java
+/**
+ * Integrator used to register the metadata object required by the BasicApplicationSqlUpdateScriptMain.java and
+ * unit tests to validate metamodel.
  */
 public class MetadataRegistryIntegrator implements org.hibernate.integrator.spi.Integrator {
 
@@ -19,6 +20,7 @@ public class MetadataRegistryIntegrator implements org.hibernate.integrator.spi.
 
 	@Override
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+		// nothing
 	}
 
 	public Metadata getMetadata() {

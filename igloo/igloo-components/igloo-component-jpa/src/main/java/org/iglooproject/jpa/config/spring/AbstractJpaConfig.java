@@ -1,33 +1,34 @@
 package org.iglooproject.jpa.config.spring;
 
-import static org.iglooproject.jpa.property.JpaPropertyIds.LUCENE_BOOLEAN_QUERY_MAX_CLAUSE_COUNT;
-
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Nullable;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.search.BooleanQuery;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.scanner.Scanner;
+import org.hibernate.integrator.spi.Integrator;
 import org.iglooproject.jpa.batch.CoreJpaBatchPackage;
 import org.iglooproject.jpa.business.generic.CoreJpaBusinessGenericPackage;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionConfigurationProvider;
-import org.iglooproject.jpa.config.spring.provider.IJpaConfigurationProvider;
+import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
 import org.iglooproject.jpa.config.spring.provider.JpaPackageScanProvider;
 import org.iglooproject.jpa.hibernate.integrator.spi.MetadataRegistryIntegrator;
+import org.iglooproject.jpa.integration.api.IJpaPropertiesConfigurer;
 import org.iglooproject.jpa.migration.IglooMigrationResolver;
 import org.iglooproject.jpa.more.config.util.FlywayConfiguration;
 import org.iglooproject.jpa.property.FlywayPropertyIds;
-import org.iglooproject.jpa.search.CoreJpaSearchPackage;
 import org.iglooproject.jpa.util.CoreJpaUtilPackage;
 import org.iglooproject.spring.property.service.IPropertyService;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -53,7 +54,6 @@ import com.google.common.collect.Maps;
 	basePackageClasses = {
 		CoreJpaBatchPackage.class,
 		CoreJpaBusinessGenericPackage.class,
-		CoreJpaSearchPackage.class,
 		CoreJpaUtilPackage.class
 	},
 	excludeFilters = @Filter(Configuration.class)
@@ -63,18 +63,7 @@ public abstract class AbstractJpaConfig {
 
 	@Autowired
 	protected IDatabaseConnectionConfigurationProvider databaseConfigurationProvider;
-
-	@Autowired
-	protected IJpaConfigurationProvider jpaConfigurationProvider;
 	
-	@Autowired
-	private IPropertyService propertyService;
-	
-	@PostConstruct
-	public void init() {
-		BooleanQuery.setMaxClauseCount(propertyService.get(LUCENE_BOOLEAN_QUERY_MAX_CLAUSE_COUNT));
-	}
-
 	@Bean
 	public MetadataRegistryIntegrator metdataRegistryIntegrator() {
 		return new MetadataRegistryIntegrator();
@@ -158,8 +147,23 @@ public abstract class AbstractJpaConfig {
 	}
 
 	@Bean
+	public IJpaPropertiesConfigurer jpaPropertiesConfigurer(IJpaPropertiesProvider jpaPropertiesProvider,
+			Collection<Integrator> integrators) {
+		return new JpaHibernatePropertiesConfigurer(jpaPropertiesProvider, integrators);
+	}
+
+	@Bean
 	@DependsOn("databaseInitialization")
-	public abstract LocalContainerEntityManagerFactoryBean entityManagerFactory();
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+			@Qualifier("dataSource") DataSource dataSource,
+			Collection<IJpaPropertiesConfigurer> configurers,
+			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
+			@Nullable PersistenceProvider persistenceProvider
+			) {
+		return JpaConfigUtils.entityManagerFactory(
+				dataSource, jpaPackagesScanProviders,
+				configurers, persistenceProvider);
+	}
 
 	@Bean
 	public abstract JpaPackageScanProvider applicationJpaPackageScanProvider();

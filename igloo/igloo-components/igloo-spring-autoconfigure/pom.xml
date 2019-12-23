@@ -54,6 +54,13 @@
 		
 		<dependency>
 			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-jpa-search-integration</artifactId>
+			<version>1.5-SNAPSHOT</version>
+			<optional>true</optional>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
 			<artifactId>igloo-component-wicket-bootstrap4</artifactId>
 			<version>1.5-SNAPSHOT</version>
 			<optional>true</optional>

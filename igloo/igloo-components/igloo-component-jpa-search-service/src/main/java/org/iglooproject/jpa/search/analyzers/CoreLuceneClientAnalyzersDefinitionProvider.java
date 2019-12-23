@@ -1,4 +1,4 @@
-package org.iglooproject.jpa.hibernate.analyzers;
+package org.iglooproject.jpa.search.analyzers;
 
 import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
 

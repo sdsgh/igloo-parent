@@ -1,6 +1,6 @@
 package org.igloo.spring.autoconfigure.search;
 
-import static org.iglooproject.jpa.property.JpaPropertyIds.LUCENE_BOOLEAN_QUERY_MAX_CLAUSE_COUNT;
+import static org.iglooproject.jpa.search.property.JpaHibernateSearchPropertyIds.LUCENE_BOOLEAN_QUERY_MAX_CLAUSE_COUNT;
 
 import javax.annotation.PostConstruct;
 

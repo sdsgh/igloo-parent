@@ -1,8 +1,11 @@
 package org.igloo.spring.autoconfigure.jpa;
 
 
+import java.util.Collection;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
 import org.igloo.spring.autoconfigure.flyway.IglooFlywayAutoConfiguration;
@@ -12,13 +15,14 @@ import org.iglooproject.jpa.business.generic.CoreJpaBusinessGenericPackage;
 import org.iglooproject.jpa.config.spring.DefaultJpaConfig;
 import org.iglooproject.jpa.config.spring.JpaApplicationPropertyRegistryConfig;
 import org.iglooproject.jpa.config.spring.JpaConfigUtils;
-import org.iglooproject.jpa.config.spring.provider.DefaultJpaConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.JpaPackageScanProvider;
 import org.iglooproject.jpa.hibernate.integrator.spi.MetadataRegistryIntegrator;
+import org.iglooproject.jpa.integration.api.IJpaPropertiesConfigurer;
 import org.iglooproject.jpa.util.CoreJpaUtilPackage;
 import org.iglooproject.spring.property.service.IPropertyService;
 import org.springframework.aop.Advisor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -116,8 +120,13 @@ public class IglooJpaAutoConfiguration {
 	 */
 	@Bean
 	@DependsOn("databaseInitialization")
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DefaultJpaConfigurationProvider defaultJpaCoreConfigurationProvider) {
-		return JpaConfigUtils.entityManagerFactory(defaultJpaCoreConfigurationProvider);
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+			@Qualifier("datasource") DataSource dataSource,
+			Collection<IJpaPropertiesConfigurer> configurers,
+			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
+			PersistenceProvider persistenceProvider
+			) {
+		return JpaConfigUtils.entityManagerFactory(dataSource, jpaPackagesScanProviders, configurers, persistenceProvider);
 	}
 
 	@Bean

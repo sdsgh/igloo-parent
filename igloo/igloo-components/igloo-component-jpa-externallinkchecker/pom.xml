@@ -21,6 +21,14 @@
 			<artifactId>igloo-component-jpa</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- TODO: remove as not needed for external link entities -->
+		<!-- Needed for tests as igloo types are not optionals -->
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-jpa-usertype-base</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		
 		<!-- Http Client -->
 		

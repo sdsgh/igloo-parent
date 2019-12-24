@@ -62,7 +62,7 @@ public class HibernateSearchAutoConfigurationTestCase {
 				(context) -> {
 					assertThat(context).hasSingleBean(IHibernateSearchService.class);
 					assertThat(context).doesNotHaveBean(BatchExecutorCreator.class);
-					assertThat(context).doesNotHaveBean(IBatchExecutorListener.class);
+					assertThat(context).doesNotHaveBean(HibernateSearchBatchExecutorConfig.HibernateSearchBatchExecutorListener.class);
 				}
 			);
 	}

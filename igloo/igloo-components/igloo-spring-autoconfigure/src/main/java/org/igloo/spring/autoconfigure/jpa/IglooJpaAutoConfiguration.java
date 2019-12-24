@@ -2,6 +2,7 @@ package org.igloo.spring.autoconfigure.jpa;
 
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
@@ -125,7 +126,7 @@ public class IglooJpaAutoConfiguration {
 	@DependsOn("databaseInitialization")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Qualifier("dataSource") DataSource dataSource,
-			Collection<IJpaPropertiesConfigurer> configurers,
+			List<IJpaPropertiesConfigurer> configurers,
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
 			@Nullable PersistenceProvider persistenceProvider
 			) {

@@ -77,7 +77,7 @@ public abstract class AbstractTestCase {
 	@Autowired
 	private EntityManagerUtils entityManagerUtils;
 	
-	@Autowired
+	@Autowired(required = false)
 	private IHibernateSearchService hibernateSearchService;
 	
 	protected abstract void cleanAll() throws ServiceException, SecurityServiceException;

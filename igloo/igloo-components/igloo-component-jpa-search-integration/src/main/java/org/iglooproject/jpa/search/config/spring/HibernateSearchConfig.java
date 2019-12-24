@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.StringUtils;
 
 @Configuration
 @Import(HibernateSearchPropertyRegistryConfig.class)
@@ -65,8 +66,14 @@ public class HibernateSearchConfig {
 	}
 
 	@Bean
-	LuceneEmbeddedAnalyzerRegistry luceneEmbedddedAnalyzerRegistry(EntityManagerFactory entityManagerFactory) {
-		return new LuceneEmbeddedFromElasticsearchAnalyzerRegistry(entityManagerFactory);
+	public LuceneEmbeddedAnalyzerRegistry luceneEmbedddedAnalyzerRegistry(
+			IHibernateSearchConfigurationProvider hibernateSearchConfigurationProvider,
+			EntityManagerFactory entityManagerFactory) {
+		if (StringUtils.hasText(hibernateSearchConfigurationProvider.getHibernateSearchIndexBase())) {
+			return new LuceneEmbeddedFromElasticsearchAnalyzerRegistry(entityManagerFactory);
+		} else {
+			return null;
+		}
 	}
 
 }

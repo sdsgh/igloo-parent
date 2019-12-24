@@ -14,11 +14,11 @@ import org.iglooproject.jpa.exception.SecurityServiceException;
 import org.iglooproject.jpa.exception.ServiceException;
 import org.iglooproject.jpa.more.util.transaction.service.ITransactionSynchronizationTaskManagerService;
 import org.iglooproject.jpa.more.util.transaction.service.TransactionSynchronizationTaskManagerServiceImpl;
-import org.iglooproject.jpa.search.service.IHibernateSearchService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -34,7 +34,9 @@ import test.jpa.more.business.entity.service.ITestEntityService;
 import test.jpa.more.business.util.transaction.model.TestCreateAfterCommitTask;
 import test.jpa.more.business.util.transaction.model.TestDeleteOnRollbackTask;
 import test.jpa.more.business.util.transaction.model.TestUseEntityBeforeCommitOrClearTask;
+import test.jpa.more.config.spring.JpaMoreTaskTestConfig;
 
+@ContextConfiguration(classes = JpaMoreTaskTestConfig.class)
 public class TestTransactionSynchronization extends AbstractJpaMoreTestCase {
 
 	@Rule
@@ -45,10 +47,7 @@ public class TestTransactionSynchronization extends AbstractJpaMoreTestCase {
 
 	@Autowired
 	private ITestEntityService testEntityService;
-	
-	@Autowired
-	private IHibernateSearchService hibernateSearchService;
-	
+
 	@Autowired
 	private BatchExecutorCreator batchExecutorCreator;
 
@@ -231,8 +230,6 @@ public class TestTransactionSynchronization extends AbstractJpaMoreTestCase {
 		TestEntity entity2 = new TestEntity("entity2");
 		testEntityService.create(entity2);
 		final Long entityId2 = entity2.getId();
-		
-		hibernateSearchService.flushToIndexes();
 		
 		final Collection<TestUseEntityBeforeCommitOrClearTask> tasks = Lists.newArrayList();
 		

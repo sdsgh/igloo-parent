@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @EnableAspectJAutoProxy
-@Import(HibernateSearchConfig.class)
 public class JpaTestJpaConfig extends AbstractConfiguredJpaConfig {
 
 	@Override

@@ -157,8 +157,8 @@ public abstract class AbstractJpaConfig {
 	@DependsOn("databaseInitialization")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Qualifier("dataSource") DataSource dataSource,
-			List<IJpaPropertiesConfigurer> configurers, // use a list -> order is important and spring must inject ordered values
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
+			List<IJpaPropertiesConfigurer> configurers, // use a list -> order is important and spring must inject ordered values
 			@Nullable PersistenceProvider persistenceProvider
 			) {
 		return JpaConfigUtils.entityManagerFactory(

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionOperations;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -101,9 +102,9 @@ public class ThreadedProcessor {
 	}
 
 	public <T> void runWithTransaction(final String loggerContext, Collection<? extends Runnable> runnables,
-			TransactionOperations TransactionOperations, Integer totalItems) throws ExecutionException {
+			TransactionOperations transactionOperations, Integer totalItems) throws ExecutionException {
 		callWithTransaction(loggerContext, runnables.stream().map(RUNNABLE_TO_CALLABLE).collect(Collectors.toList()),
-				TransactionOperations, totalItems);
+				transactionOperations, totalItems);
 	}
 
 	public <T> List<T> callWithoutTransaction(String loggerContext, Collection<? extends Callable<T>> callables)
@@ -117,7 +118,7 @@ public class ThreadedProcessor {
 	}
 
 	public <T> List<T> callWithTransaction(final String loggerContext, Collection<? extends Callable<T>> callables,
-			TransactionOperations TransactionOperations, Integer totalItems) throws ExecutionException {
+			TransactionOperations transactionOperations, Integer totalItems) throws ExecutionException {
 		List<ListenableFuture<T>> futures = Lists.newArrayList();
 		
 		// ThreadedPoolExecutor cannot be reused after shutdown, so we must instantiate it on each call.
@@ -150,10 +151,10 @@ public class ThreadedProcessor {
 				for (Callable<T> callable : callables) {
 					Callable<T> wrappedCallable = new ThreadLocalInitializingCallable<>(callable,
 							ProcessorMonitorContext.getThreadLocal(), monitorContext);
-					if (TransactionOperations != null) {
+					if (transactionOperations != null) {
 						// All executions are wrapped in a separate transaction
 						// (if the template was provided)
-						wrappedCallable = new TransactionWrapperCallable<>(TransactionOperations, wrappedCallable);
+						wrappedCallable = new TransactionWrapperCallable<>(transactionOperations, wrappedCallable);
 					}
 
 					ListenableFuture<T> future = executor.submit(wrappedCallable);
@@ -292,7 +293,7 @@ public class ThreadedProcessor {
 					lastDoneItems = doneItems;
 	
 					StringBuilder sb = new StringBuilder();
-					if (StringUtils.hasText(loggerContext)) {
+					if ( ! Strings.isNullOrEmpty(loggerContext)) {
 						sb.append(loggerContext).append(" - ");
 					}
 					sb.append("In progress: {} / {} ({} ignored, {} items/s since start, {} items/s since last log)");
@@ -302,7 +303,7 @@ public class ThreadedProcessor {
 			}
 			if (progressLogger.isDebugEnabled()) {
 				StringBuilder sb = new StringBuilder();
-				if (StringUtils.hasText(loggerContext)) {
+				if ( ! Strings.isNullOrEmpty(loggerContext)) {
 					sb.append(loggerContext).append(" - ");
 				}
 				sb.append("Available memory: {} / {}");

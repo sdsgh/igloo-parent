@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.iglooproject.jpa.batch.processor.ThreadedProcessor;
+import org.iglooproject.jpa.batch.runnable.IBatchRunnable;
+import org.iglooproject.jpa.batch.util.ProcessorProgressLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -17,10 +20,6 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Lists;
-
-import org.iglooproject.jpa.batch.processor.ThreadedProcessor;
-import org.iglooproject.jpa.batch.runnable.IBatchRunnable;
-import org.iglooproject.jpa.batch.util.ProcessorProgressLogger;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -35,7 +34,7 @@ public class MultithreadedBatchExecutor extends AbstractBatchExecutor<Multithrea
 	private int timeoutInMinutes = 15;
 	
 	private boolean abortAllOnExecutionError = true;
-	
+
 	public MultithreadedBatchExecutor threads(int threads) {
 		this.threads = threads;
 		return this;
@@ -54,7 +53,7 @@ public class MultithreadedBatchExecutor extends AbstractBatchExecutor<Multithrea
 	public void run(String context, final List<Long> entityIds, final IBatchRunnable<Long> batchRunnable) {
 		Date startTime = new Date();
 		
-		LOGGER.info("Beginning batch for %1$s: %2$d objects", context, entityIds.size());
+		LOGGER.info("Beginning batch for {}: {} objects", context, entityIds.size());
 		
 		TransactionTemplate transactionTemplate =
 				newTransactionTemplate(batchRunnable.getWriteability(), TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -153,7 +152,9 @@ public class MultithreadedBatchExecutor extends AbstractBatchExecutor<Multithrea
 			// Log this as info anyway, since error handling is done elsewhere
 			sb.append(String.format(", but caught exception '%s'.", e));
 		}
-		PROGRESS_LOGGER.info(sb.toString());
+		if (PROGRESS_LOGGER.isInfoEnabled()) {
+			PROGRESS_LOGGER.info(sb.toString());
+		}
 	}
 
 	@Override

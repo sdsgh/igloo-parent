@@ -33,8 +33,6 @@
 	</dependencyManagement>
 
 	<dependencies>
-		
-		<!-- Spring: beans, transaction, context -->
 		<dependency>
 			<groupId>org.iglooproject.components</groupId>
 			<artifactId>igloo-component-jpa-integration-api</artifactId>
@@ -42,9 +40,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.iglooproject.components</groupId>
+			<artifactId>igloo-component-jpa-batch-executor-api</artifactId>
+			<version>${project.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.iglooproject.components</groupId>
 			<artifactId>igloo-component-jpa-search-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Spring: beans, transaction, context -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>

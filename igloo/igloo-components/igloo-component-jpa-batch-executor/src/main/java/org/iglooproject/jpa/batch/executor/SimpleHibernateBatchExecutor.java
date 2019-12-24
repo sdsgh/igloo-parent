@@ -1,15 +1,23 @@
 package org.iglooproject.jpa.batch.executor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import org.iglooproject.functional.Joiners;
+import org.iglooproject.jpa.batch.api.IBatchExecutorListener;
+import org.iglooproject.jpa.batch.api.IBeforeClearListener;
+import org.iglooproject.jpa.batch.runnable.IBatchRunnable;
+import org.iglooproject.jpa.batch.runnable.Writeability;
+import org.iglooproject.jpa.business.generic.model.GenericEntity;
+import org.iglooproject.jpa.business.generic.model.GenericEntityCollectionReference;
+import org.iglooproject.jpa.exception.ServiceException;
+import org.iglooproject.jpa.query.IQuery;
+import org.iglooproject.jpa.query.Queries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
@@ -19,31 +27,21 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionOperations;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import org.iglooproject.functional.Joiners;
-import org.iglooproject.jpa.batch.runnable.IBatchRunnable;
-import org.iglooproject.jpa.batch.runnable.Writeability;
-import org.iglooproject.jpa.batch.util.IBeforeClearListener;
-import org.iglooproject.jpa.business.generic.model.GenericEntity;
-import org.iglooproject.jpa.business.generic.model.GenericEntityCollectionReference;
-import org.iglooproject.jpa.exception.ServiceException;
-import org.iglooproject.jpa.query.IQuery;
-import org.iglooproject.jpa.query.Queries;
-
-@Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHibernateBatchExecutor> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleHibernateBatchExecutor.class);
 	
-	@Autowired(required = false)
-	private Collection<IBeforeClearListener> clearListeners = ImmutableList.of();
+	private final Collection<IBatchExecutorListener> batchExecutorListeners;
 
 	private ExecutionStrategyFactory executionStrategyFactory = ExecutionStrategyFactory.COMMIT_ON_END;
 	
-	private List<Class<?>> classesToReindex = Lists.newArrayListWithCapacity(0);
+	private final List<Class<?>> classesToReindex = new ArrayList<>();
+
+	public SimpleHibernateBatchExecutor(Collection<IBatchExecutorListener> batchExecutorListeners) {
+		this.batchExecutorListeners = Optional.ofNullable(batchExecutorListeners).orElseGet(ArrayList::new);
+	}
 
 	/**
 	 * Use one transaction for the whole execution, periodically flushing the Hibernate session and the Hibernate Search
@@ -83,7 +81,8 @@ public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHi
 	 * <p>Mostly useful when using {@link #commitOnEnd()} transaction strategy.
 	 */
 	public SimpleHibernateBatchExecutor reindexClasses(Class<?> clazz, Class<?>... classes) {
-		classesToReindex = Lists.asList(clazz, classes);
+		classesToReindex.clear();
+		classesToReindex.addAll(Lists.asList(clazz, classes));
 		return this;
 	}
 
@@ -152,61 +151,34 @@ public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHi
 			boolean consuming) {
 		long expectedTotalCount = executionStrategy.getExpectedTotalCount();
 		long offset = 0;
-		LOGGER.info("Beginning batch for %1$s: %2$d objects", loggerContext, expectedTotalCount);
+		LOGGER.info("Beginning batch for {}: {} objects", loggerContext, expectedTotalCount);
 		
 		try {
 			LOGGER.info("    preExecute start");
 			
-			try {
-				executionStrategy.preExecute();
-			} catch (RuntimeException e) {
-				throw new ExecutionException("Exception on preExecute", e);
-			}
+			doRunPreExecute(executionStrategy);
 			
 			LOGGER.info("    preExecute end");
 			
 			LOGGER.info("    starting batch executions");
 			
-			try {
-				int partitionSize;
-				do {
-					partitionSize = executionStrategy.executePartition(
-							// Don't use the offset if the runnable is consuming the query's results
-							consuming ? 0 : offset, batchSize
-					);
-					
-					offset += partitionSize;
-					LOGGER.info("        treated %1$d/%2$d objects", offset, expectedTotalCount);
-				} while (partitionSize > 0);
-			} catch (RuntimeException e) {
-				throw new ExecutionException("Exception on executePartition", e);
-			}
+			offset = doRunExecute(executionStrategy, consuming, expectedTotalCount, offset);
 			
 			LOGGER.info("    end of batch executions");
 	
 			LOGGER.info("    postExecute start");
 			
-			try {
-				executionStrategy.postExecute();
-			} catch (RuntimeException e) {
-				throw new ExecutionException("Exception on postExecute", e);
-			}
+			doRunPostExecute(executionStrategy);
 			
 			LOGGER.info("    postExecute end");
 			
-			if (classesToReindex.size() > 0) {
-				LOGGER.info("    reindexing classes %1$s", Joiners.onComma().join(classesToReindex));
-				try {
-					hibernateSearchService.reindexClasses(classesToReindex);
-				} catch (ServiceException e) {
-					LOGGER.error("    reindexing failure", e);
-				}
-				LOGGER.info("    end of reindexing");
-			}
+			doRunEnd();
 			
-			LOGGER.info("End of batch for %1$s: %2$d/%3$d objects treated", loggerContext, offset, expectedTotalCount);
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("End of batch for {}: {}/{} objects treated", loggerContext, offset, expectedTotalCount);
+			}
 		} catch (ExecutionException e) {
-			LOGGER.info("End of batch for %1$s: %2$d/%3$d objects treated, but caught exception '%s'",
+			LOGGER.info("End of batch for {}: {}/{} objects treated",
 					loggerContext, offset, expectedTotalCount, e);
 			try {
 				LOGGER.info("    onError start");
@@ -216,6 +188,59 @@ public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHi
 				LOGGER.info("    onError end (exception WAS propagated)");
 				throw e2;
 			}
+		}
+	}
+
+	protected void doRunEnd() {
+		if ( ! classesToReindex.isEmpty()) {
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("    reindexing classes {}", Joiners.onComma().join(classesToReindex));
+			}
+			for (IBatchExecutorListener batchExecutorListener : batchExecutorListeners) {
+				try {
+					batchExecutorListener.onBatchExecutorEnd(classesToReindex);
+				} catch (ServiceException e) {
+					LOGGER.error("    reindexing failure", e);
+				}
+			}
+			LOGGER.info("    end of reindexing");
+		}
+	}
+
+	protected <E extends GenericEntity<Long, ?>> void doRunPostExecute(ExecutionStrategy<E> executionStrategy)
+			throws ExecutionException {
+		try {
+			executionStrategy.postExecute();
+		} catch (RuntimeException e) {
+			throw new ExecutionException("Exception on postExecute", e);
+		}
+	}
+
+	protected <E extends GenericEntity<Long, ?>> long doRunExecute(ExecutionStrategy<E> executionStrategy,
+			boolean consuming, long expectedTotalCount, long offset) throws ExecutionException {
+		try {
+			int partitionSize;
+			do {
+				partitionSize = executionStrategy.executePartition(
+						// Don't use the offset if the runnable is consuming the query's results
+						consuming ? 0 : offset, batchSize
+				);
+				
+				offset += partitionSize;
+				LOGGER.info("        treated {}/{} objects", offset, expectedTotalCount);
+			} while (partitionSize > 0);
+		} catch (RuntimeException e) {
+			throw new ExecutionException("Exception on executePartition", e);
+		}
+		return offset;
+	}
+
+	protected <E extends GenericEntity<Long, ?>> void doRunPreExecute(ExecutionStrategy<E> executionStrategy)
+			throws ExecutionException {
+		try {
+			executionStrategy.preExecute();
+		} catch (RuntimeException e) {
+			throw new ExecutionException("Exception on preExecute", e);
 		}
 	}
 	
@@ -283,7 +308,7 @@ public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHi
 		}
 	}
 	
-	private final static class CommitOnEndExecutionStrategy<T> extends ExecutionStrategy<T> {
+	private static final class CommitOnEndExecutionStrategy<T> extends ExecutionStrategy<T> {
 		private final boolean isReadOnly = Writeability.READ_ONLY.equals(runnable.getWriteability());
 
 		private CommitOnEndExecutionStrategy(SimpleHibernateBatchExecutor executor, IQuery<T> query,
@@ -307,11 +332,13 @@ public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHi
 			if (!isReadOnly) {
 				executor.entityService.flush();
 			}
-			for (IBeforeClearListener beforeClearListener : executor.clearListeners) {
+			for (IBeforeClearListener beforeClearListener : executor.batchExecutorListeners) {
 				beforeClearListener.beforeClear();
 			}
 			if (!isReadOnly) {
-				executor.hibernateSearchService.flushToIndexes();
+				for (IBatchExecutorListener batchExecutorListener : executor.batchExecutorListeners) {
+					batchExecutorListener.onBatchExecutorFlush();
+				}
 			}
 			executor.entityService.clear();
 		}
@@ -341,7 +368,7 @@ public class SimpleHibernateBatchExecutor extends AbstractBatchExecutor<SimpleHi
 		}
 	}
 
-	private final static class CommitOnStepExecutionStrategy<T> extends ExecutionStrategy<T> {
+	private static final class CommitOnStepExecutionStrategy<T> extends ExecutionStrategy<T> {
 		private final TransactionOperations stepTransactionTemplate = executor.newTransactionTemplate(
 				runnable.getWriteability(), TransactionDefinition.PROPAGATION_REQUIRES_NEW
 		);

@@ -28,6 +28,8 @@ import org.springframework.util.StringUtils;
 
 public class JpaHibernatePropertiesConfigurer implements IJpaPropertiesConfigurer {
 
+	public static final int ORDER = 50;
+
 	private final IJpaPropertiesProvider configuration;
 
 	private final Collection<Integrator> integrators;
@@ -51,6 +53,9 @@ public class JpaHibernatePropertiesConfigurer implements IJpaPropertiesConfigure
 				Boolean.valueOf(configuration.isCreateEmptyCompositesEnabled()).toString());
 		
 		properties.setProperty(AvailableSettings.JPAQL_STRICT_COMPLIANCE, Boolean.TRUE.toString());
+		
+		// this property must be reset by Igloo hibernate search own configurer
+		properties.setProperty("hibernate.search.autoregister_listeners", Boolean.FALSE.toString());
 		
 		configurePerformance(properties);
 		configureHbm2Ddl(properties);

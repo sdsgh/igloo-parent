@@ -3,19 +3,22 @@ package org.igloo.spring.autoconfigure.jpa;
 
 import java.util.Collection;
 
+import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
 
+import org.hibernate.integrator.spi.Integrator;
 import org.igloo.spring.autoconfigure.flyway.IglooFlywayAutoConfiguration;
 import org.iglooproject.config.bootstrap.spring.annotations.IglooPropertySourcePriority;
-import org.iglooproject.jpa.batch.CoreJpaBatchPackage;
 import org.iglooproject.jpa.business.generic.CoreJpaBusinessGenericPackage;
 import org.iglooproject.jpa.config.spring.DefaultJpaConfig;
 import org.iglooproject.jpa.config.spring.JpaApplicationPropertyRegistryConfig;
 import org.iglooproject.jpa.config.spring.JpaConfigUtils;
+import org.iglooproject.jpa.config.spring.JpaHibernatePropertiesConfigurer;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionConfigurationProvider;
+import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
 import org.iglooproject.jpa.config.spring.provider.JpaPackageScanProvider;
 import org.iglooproject.jpa.hibernate.integrator.spi.MetadataRegistryIntegrator;
 import org.iglooproject.jpa.integration.api.IJpaPropertiesConfigurer;
@@ -37,6 +40,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -56,7 +60,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import({ DefaultJpaConfig.class })
 @ComponentScan(
 	basePackageClasses = {
-		CoreJpaBatchPackage.class,
 		CoreJpaBusinessGenericPackage.class,
 		CoreJpaUtilPackage.class
 	},
@@ -121,12 +124,19 @@ public class IglooJpaAutoConfiguration {
 	@Bean
 	@DependsOn("databaseInitialization")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-			@Qualifier("datasource") DataSource dataSource,
+			@Qualifier("dataSource") DataSource dataSource,
 			Collection<IJpaPropertiesConfigurer> configurers,
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
-			PersistenceProvider persistenceProvider
+			@Nullable PersistenceProvider persistenceProvider
 			) {
 		return JpaConfigUtils.entityManagerFactory(dataSource, jpaPackagesScanProviders, configurers, persistenceProvider);
+	}
+
+	@Bean
+	@Order(JpaHibernatePropertiesConfigurer.ORDER)
+	public IJpaPropertiesConfigurer jpaPropertiesConfigurer(IJpaPropertiesProvider jpaPropertiesProvider,
+			Collection<Integrator> integrators) {
+		return new JpaHibernatePropertiesConfigurer(jpaPropertiesProvider, integrators);
 	}
 
 	@Bean

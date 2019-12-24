@@ -2,6 +2,7 @@ package org.iglooproject.jpa.config.spring;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -14,7 +15,6 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.scanner.Scanner;
 import org.hibernate.integrator.spi.Integrator;
-import org.iglooproject.jpa.batch.CoreJpaBatchPackage;
 import org.iglooproject.jpa.business.generic.CoreJpaBusinessGenericPackage;
 import org.iglooproject.jpa.config.spring.provider.IDatabaseConnectionConfigurationProvider;
 import org.iglooproject.jpa.config.spring.provider.IJpaPropertiesProvider;
@@ -40,6 +40,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -52,7 +53,6 @@ import com.google.common.collect.Maps;
  */
 @ComponentScan(
 	basePackageClasses = {
-		CoreJpaBatchPackage.class,
 		CoreJpaBusinessGenericPackage.class,
 		CoreJpaUtilPackage.class
 	},
@@ -147,6 +147,7 @@ public abstract class AbstractJpaConfig {
 	}
 
 	@Bean
+	@Order(JpaHibernatePropertiesConfigurer.ORDER)
 	public IJpaPropertiesConfigurer jpaPropertiesConfigurer(IJpaPropertiesProvider jpaPropertiesProvider,
 			Collection<Integrator> integrators) {
 		return new JpaHibernatePropertiesConfigurer(jpaPropertiesProvider, integrators);
@@ -156,7 +157,7 @@ public abstract class AbstractJpaConfig {
 	@DependsOn("databaseInitialization")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Qualifier("dataSource") DataSource dataSource,
-			Collection<IJpaPropertiesConfigurer> configurers,
+			List<IJpaPropertiesConfigurer> configurers, // use a list -> order is important and spring must inject ordered values
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
 			@Nullable PersistenceProvider persistenceProvider
 			) {

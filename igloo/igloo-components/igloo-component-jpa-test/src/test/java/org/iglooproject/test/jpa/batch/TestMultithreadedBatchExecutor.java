@@ -13,16 +13,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-
-import com.google.common.collect.Lists;
-
 import org.iglooproject.functional.Joiners;
 import org.iglooproject.jpa.batch.executor.BatchExecutorCreator;
 import org.iglooproject.jpa.batch.executor.MultithreadedBatchExecutor;
@@ -31,6 +23,14 @@ import org.iglooproject.jpa.batch.runnable.ReadWriteBatchRunnable;
 import org.iglooproject.jpa.exception.SecurityServiceException;
 import org.iglooproject.jpa.exception.ServiceException;
 import org.iglooproject.test.business.person.model.Person;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+
+import com.google.common.collect.Lists;
 
 public class TestMultithreadedBatchExecutor extends AbstractTestHibernateBatchExecutor {
 
@@ -234,6 +234,7 @@ public class TestMultithreadedBatchExecutor extends AbstractTestHibernateBatchEx
 
 		Exception runException = null;
 		ConcurrentFailingRunnable<Long> runnable = new ConcurrentFailingRunnable<Long>(); // Requires at least 2 threads
+		Assertions.assertThat(personIds.size()).isEqualTo(99);
 		try {
 			executor.run("FailingProcess", personIds, runnable);
 		} catch (Exception e) {
@@ -246,7 +247,7 @@ public class TestMultithreadedBatchExecutor extends AbstractTestHibernateBatchEx
 		assertEquals(1, runException.getCause().getSuppressed().length);
 		assertThat(Arrays.asList(runException.getCause().getSuppressed()),
 				everyItem(CoreMatchers.<Throwable>instanceOf(TestBatchException1.class)));
-		assertTrue("The executor did not abort as expected", 10 > runnable.getExecutedPartitionCount());
+		Assertions.assertThat(runnable.getExecutedPartitionCount()).isLessThan(10).as("The executor did not abort as expected");
 	}
 	
 	@Test

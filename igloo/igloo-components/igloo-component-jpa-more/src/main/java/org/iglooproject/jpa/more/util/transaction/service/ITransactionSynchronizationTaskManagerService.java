@@ -1,11 +1,13 @@
 package org.iglooproject.jpa.more.util.transaction.service;
 
-import org.iglooproject.jpa.batch.util.IBeforeClearListener;
+import javax.persistence.EntityManager;
+
+import org.iglooproject.jpa.batch.api.IBatchExecutorListener;
 import org.iglooproject.jpa.more.util.transaction.model.ITransactionSynchronizationAfterCommitTask;
 import org.iglooproject.jpa.more.util.transaction.model.ITransactionSynchronizationBeforeCommitTask;
 import org.iglooproject.jpa.more.util.transaction.model.ITransactionSynchronizationTaskRollbackAware;
 
-public interface ITransactionSynchronizationTaskManagerService extends IBeforeClearListener {
+public interface ITransactionSynchronizationTaskManagerService extends IBatchExecutorListener {
 
 	/**
 	 * Push a task to be executed <strong>before</strong> commit.

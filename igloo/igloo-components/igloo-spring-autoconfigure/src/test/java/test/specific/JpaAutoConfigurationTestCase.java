@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.assertj.core.api.Condition;
 import org.igloo.spring.autoconfigure.EnableIglooAutoConfiguration;
 import org.igloo.spring.autoconfigure.IglooAutoConfigurationImportSelector;
 import org.igloo.spring.autoconfigure.applicationconfig.IglooApplicationConfigAutoConfiguration;
@@ -16,6 +17,11 @@ import org.igloo.spring.autoconfigure.search.IglooHibernateSearchAutoConfigurati
 import org.igloo.spring.autoconfigure.security.IglooJpaSecurityAutoConfiguration;
 import org.igloo.spring.autoconfigure.task.IglooTaskManagementAutoConfiguration;
 import org.igloo.spring.autoconfigure.wicket.IglooWicketAutoConfiguration;
+import org.iglooproject.jpa.batch.api.IBatchExecutorListener;
+import org.iglooproject.jpa.batch.executor.BatchExecutorCreator;
+import org.iglooproject.jpa.more.util.transaction.service.TransactionSynchronizationTaskManagerServiceImpl;
+import org.iglooproject.jpa.search.config.spring.HibernateSearchBatchExecutorConfig.HibernateSearchBatchExecutorListener;
+import org.iglooproject.jpa.search.service.IHibernateSearchService;
 import org.iglooproject.spring.property.service.IPropertyService;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -69,6 +75,49 @@ public class JpaAutoConfigurationTestCase {
 				(context) -> {
 					assertThat(context).hasSingleBean(EntityManagerFactory.class);
 					assertThat(context).doesNotHaveBean(IPropertyService.class);
+					assertThat(context).hasSingleBean(BatchExecutorCreator.class);
+				}
+			);
+	}
+
+	/**
+	 * Check that autoconfiguration can be triggerred with batch executor, tasks and without hibernate search
+	 */
+	@Test
+	public void testIglooJpaHibernateSearchLessAutoConfigure() {
+		new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(TestConfig.class))
+			.withPropertyValues("igloo-ac.hsearch.disabled", "true")
+			.withPropertyValues("hibernate", "true")
+			.run(
+				(context) -> {
+					assertThat(context).doesNotHaveBean(IHibernateSearchService.class);
+					assertThat(context).doesNotHaveBean(HibernateSearchBatchExecutorListener.class);
+					assertThat(context).getBeans(IBatchExecutorListener.class).hasValueSatisfying(
+							new Condition<>(
+									TransactionSynchronizationTaskManagerServiceImpl.class::isInstance,
+									"Task implementation for IBatchExecutorListener must be present in beans"
+							)
+					);
+				}
+			);
+	}
+
+	/**
+	 * Check that autoconfiguration can be triggerred without batch executor and without hibernate search
+	 */
+	@Test
+	public void testIglooJpaHibernateSearchLessBatchExecutorLessAutoConfigure() {
+		new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(TestConfig.class))
+			.withPropertyValues("igloo-ac.hsearch.disabled", "true")
+			.withPropertyValues("igloo-ac.batch-executor.disabled", "true")
+			.withPropertyValues("hibernate", "true")
+			.run(
+				(context) -> {
+					assertThat(context).doesNotHaveBean(IHibernateSearchService.class);
+					assertThat(context).doesNotHaveBean(BatchExecutorCreator.class);
+					assertThat(context).doesNotHaveBean(HibernateSearchBatchExecutorListener.class);
 				}
 			);
 	}

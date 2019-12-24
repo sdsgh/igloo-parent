@@ -7,9 +7,11 @@ import static org.iglooproject.jpa.search.property.JpaHibernateSearchPropertyIds
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManagerFactory;
 
 import org.apache.lucene.search.BooleanQuery;
 import org.iglooproject.jpa.search.analyzers.LuceneEmbeddedAnalyzerRegistry;
+import org.iglooproject.jpa.search.analyzers.LuceneEmbeddedFromElasticsearchAnalyzerRegistry;
 import org.iglooproject.jpa.search.config.spring.provider.DefaultHibernateSearchConfigurationProvider;
 import org.iglooproject.jpa.search.config.spring.provider.HibernateSearchPropertiesConfigurer;
 import org.iglooproject.jpa.search.config.spring.provider.IHibernateSearchConfigurationProvider;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 @Import(HibernateSearchPropertyRegistryConfig.class)
@@ -56,8 +59,14 @@ public class HibernateSearchConfig {
 	}
 
 	@Bean
+	@Order(HibernateSearchPropertiesConfigurer.ORDER)
 	public HibernateSearchPropertiesConfigurer hibernateSearchPropertiesConfigurer(IHibernateSearchConfigurationProvider hibernateSearchConfigurationProvider) {
 		return new HibernateSearchPropertiesConfigurer(hibernateSearchConfigurationProvider);
+	}
+
+	@Bean
+	LuceneEmbeddedAnalyzerRegistry luceneEmbedddedAnalyzerRegistry(EntityManagerFactory entityManagerFactory) {
+		return new LuceneEmbeddedFromElasticsearchAnalyzerRegistry(entityManagerFactory);
 	}
 
 }

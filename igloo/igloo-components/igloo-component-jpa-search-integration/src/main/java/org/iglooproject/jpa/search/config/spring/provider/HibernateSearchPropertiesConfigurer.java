@@ -3,6 +3,7 @@ package org.iglooproject.jpa.search.config.spring.provider;
 import java.util.Properties;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
@@ -13,6 +14,8 @@ import org.springframework.util.StringUtils;
 
 public class HibernateSearchPropertiesConfigurer implements IJpaPropertiesConfigurer {
 
+	public static final int ORDER = 100;
+
 	private final IHibernateSearchConfigurationProvider configuration;
 
 	public HibernateSearchPropertiesConfigurer(IHibernateSearchConfigurationProvider hibernateSearchConfigurationProvider) {
@@ -22,6 +25,8 @@ public class HibernateSearchPropertiesConfigurer implements IJpaPropertiesConfig
 	@Override
 	public void configure(Properties properties) {
 		String hibernateSearchIndexBase = configuration.getHibernateSearchIndexBase();
+		
+		properties.put(Environment.AUTOREGISTER_LISTENERS, Boolean.TRUE.toString());
 		
 		if (configuration.isHibernateSearchElasticSearchEnabled()) {
 			properties.setProperty(ElasticsearchEnvironment.ANALYSIS_DEFINITION_PROVIDER, CoreElasticSearchAnalyzersDefinitionProvider.class.getName());

@@ -306,4 +306,14 @@ public class TransactionSynchronizationTaskManagerServiceImpl
 			}
 		}
 	}
+
+	@Override
+	public void onBatchExecutorFlush() {
+		// Nothing
+	}
+
+	@Override
+	public void onBatchExecutorEnd(Collection<Class<?>> modifiedEntityTypes) {
+		// Nothing
+	}
 }

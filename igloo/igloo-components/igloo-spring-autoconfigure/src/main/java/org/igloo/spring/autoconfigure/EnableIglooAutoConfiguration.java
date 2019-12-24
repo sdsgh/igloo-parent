@@ -12,6 +12,7 @@ import org.igloo.spring.autoconfigure.bootstrap.IglooBootstrap3AutoConfiguration
 import org.igloo.spring.autoconfigure.bootstrap.IglooBootstrap4AutoConfiguration;
 import org.igloo.spring.autoconfigure.flyway.IglooFlywayAutoConfiguration;
 import org.igloo.spring.autoconfigure.jpa.IglooJpaAutoConfiguration;
+import org.igloo.spring.autoconfigure.jpa.IglooJpaBatchExecutorAutoConfiguration;
 import org.igloo.spring.autoconfigure.jpa.IglooJpaMoreAutoConfiguration;
 import org.igloo.spring.autoconfigure.property.IglooPropertyAutoConfiguration;
 import org.igloo.spring.autoconfigure.search.IglooHibernateSearchAutoConfiguration;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Import;
  * 
  * <ul>
  * <li>igloo-ac.jpa.disabled: {@link IglooJpaAutoConfiguration}</li>
+ * <li>igloo-ac.batch-executor.disabled: {@link IglooJpaBatchExecutorAutoConfiguration}</li>
  * <li>igloo-ac.jpa-more.disabled: {@link IglooJpaMoreAutoConfiguration}</li>
  * <li>igloo-ac.flyway.disabled: {@link IglooFlywayAutoConfiguration}</li>
  * <li>igloo-ac.jpa-security.disabled: {@link IglooJpaSecurityAutoConfiguration}</li>

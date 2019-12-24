@@ -2,6 +2,7 @@
 # PlaceholderAutoConfiguration is added as empty value is invalid for AutoConfigurationImportSelector
 org.igloo.spring.autoconfigure.EnableIglooAutoConfiguration=\
 org.igloo.spring.autoconfigure.jpa.IglooJpaAutoConfiguration, \
+org.igloo.spring.autoconfigure.jpa.IglooJpaBatchExecutorAutoConfiguration, \
 org.igloo.spring.autoconfigure.jpa.IglooJpaMoreAutoConfiguration, \
 org.igloo.spring.autoconfigure.property.IglooPropertyAutoConfiguration, \
 org.igloo.spring.autoconfigure.search.IglooHibernateSearchAutoConfiguration, \

@@ -44,6 +44,9 @@
 		<module>igloo-component-jpa-usertype-base</module>
 		<module>igloo-component-jpa-integration-api</module>
 		<module>igloo-component-jpa</module>
+		<module>igloo-component-jpa-batch-executor</module>
+		<module>igloo-component-jpa-batch-executor-api</module>
+		<module>igloo-component-jpa-batch-executor-integration</module>
 		<module>igloo-component-jpa-search-service</module>
 		<module>igloo-component-jpa-search-integration</module>
 		<module>igloo-component-jpa-test</module>

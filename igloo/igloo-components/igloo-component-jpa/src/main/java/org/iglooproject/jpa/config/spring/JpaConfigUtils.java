@@ -42,7 +42,7 @@ public final class JpaConfigUtils {
 	public static LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			DataSource dataSource,
 			Collection<JpaPackageScanProvider> jpaPackagesScanProviders,
-			Collection<IJpaPropertiesConfigurer> configurers,
+			List<IJpaPropertiesConfigurer> configurers,
 			PersistenceProvider persistenceProvider) {
 		Properties properties = new Properties();
 		for (IJpaPropertiesConfigurer propertiesConfigurer : configurers) {

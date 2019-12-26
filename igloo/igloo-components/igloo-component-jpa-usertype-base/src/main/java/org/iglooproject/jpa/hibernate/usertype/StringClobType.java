@@ -41,6 +41,7 @@ import org.hibernate.usertype.UserType;
  * Copied from the original org.hibernate.type.StringClobType.
  *
  * @author Emmanuel Bernard
+ * @deprecated use @{@link javax.persistence.Lob} with {@link String} type
  */
 public class StringClobType implements UserType, Serializable {
 	private static final long serialVersionUID = 1L;

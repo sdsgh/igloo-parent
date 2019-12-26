@@ -7,16 +7,14 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
+import javax.persistence.Lob;
 import javax.persistence.OrderColumn;
 
 import org.bindgen.Bindable;
-import org.hibernate.annotations.Type;
-
-import com.google.common.collect.Lists;
-
-import org.iglooproject.basicapp.core.config.hibernate.TypeDefinitions;
 import org.iglooproject.commons.util.CloneUtils;
 import org.iglooproject.commons.util.collections.CollectionUtils;
+
+import com.google.common.collect.Lists;
 
 @Embeddable
 @Bindable
@@ -29,7 +27,7 @@ public class UserPasswordInformation implements Serializable {
 
 	@ElementCollection
 	@OrderColumn
-	@Type(type = TypeDefinitions.STRING_CLOB)
+	@Lob
 	private List<String> history = Lists.newArrayList();
 
 	public Date getLastUpdateDate() {
